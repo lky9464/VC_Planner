@@ -6,11 +6,12 @@ import type { StepId } from "@/lib/steps";
 
 type Props = {
   current: StepId;
+  completedSteps: Record<StepId, boolean>;
   onSelect: (step: StepId) => void;
   saveStatus: SaveStatus;
 };
 
-export function Header({ current, onSelect, saveStatus }: Props) {
+export function Header({ current, completedSteps, onSelect, saveStatus }: Props) {
   return (
     <header className="sticky top-0 z-20 border-b border-line bg-bg/85 backdrop-blur">
       <div className="mx-auto flex h-14 max-w-[1600px] items-center gap-4 px-4">
@@ -27,7 +28,11 @@ export function Header({ current, onSelect, saveStatus }: Props) {
         </div>
 
         <div className="flex flex-1 justify-center overflow-x-auto">
-          <StepProgress current={current} onSelect={onSelect} />
+          <StepProgress
+            current={current}
+            completedSteps={completedSteps}
+            onSelect={onSelect}
+          />
         </div>
 
         <div className="hidden shrink-0 sm:block">

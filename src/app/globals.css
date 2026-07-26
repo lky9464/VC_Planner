@@ -37,6 +37,39 @@ html {
   color-scheme: dark;
 }
 
+.react-flow__node {
+  font-family: var(--font-sans);
+}
+
+/* 드래그 중 노드가 캔버스 뒤로 숨지 않도록 */
+.react-flow__node.dragging,
+.react-flow__node.selected {
+  z-index: 1000 !important;
+}
+
+.react-flow__edge-path {
+  stroke: var(--accent);
+}
+
+/* 와이어프레임 그리드 — 다크 테마 (Phase 5) */
+.wireframe-canvas .react-grid-layout {
+  min-height: 280px;
+}
+
+.wireframe-canvas .react-grid-item {
+  transition: none;
+}
+
+.wireframe-canvas .react-grid-item.react-grid-placeholder {
+  background: var(--accent-soft);
+  border: 1px dashed var(--accent);
+  opacity: 0.45;
+}
+
+.wireframe-canvas .react-resizable-handle::after {
+  border-color: var(--accent);
+}
+
 body {
   background: var(--bg);
   color: var(--fg);

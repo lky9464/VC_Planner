@@ -1,42 +1,110 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Eye, X } from "lucide-react";
+import { useProject } from "@/context/ProjectContext";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
 import { BottomNav } from "./BottomNav";
+import { ValidationAlert } from "./ValidationAlert";
+import { FinishSuccessAlert } from "./FinishSuccessAlert";
 import { PreviewPane } from "@/components/preview/PreviewPane";
 import { StepCard } from "@/components/steps/StepCard";
 import { StepBody } from "@/components/steps/StepBody";
 import { FIRST_STEP, LAST_STEP, STEPS, type StepId } from "@/lib/steps";
+import {
+  canProceedToResults,
+  getIncompleteFields,
+  getStepCompletionMap,
+} from "@/lib/validation/completion";
 
 /**
  * 위저드 셸. Step 전환은 라우팅이 아니라 상태로 처리한다.
  * (정적 배포에서 새로고침 404를 피하고 입력 상태를 유지하기 위함)
  */
 export function PlannerShell() {
+  const { state, saveStatus } = useProject();
   const [current, setCurrent] = useState<StepId>(FIRST_STEP);
   const [isPreviewOpen, setPreviewOpen] = useState(false);
+  /** Step 4 하단 「명세서 받기」 클릭 시에만 미완료 경고 표시 */
+  const [finishWarning, setFinishWarning] = useState(false);
+  /** 검증 통과 후 성공 안내 */
+  const [finishSuccess, setFinishSuccess] = useState(false);
+
+  const completedSteps = useMemo(() => getStepCompletionMap(state), [state]);
+  const incompleteFields = useMemo(() => getIncompleteFields(state), [state]);
 
   const step = STEPS.find((s) => s.id === current) ?? STEPS[0];
 
+  const goToStep = (target: StepId) => {
+    setFinishWarning(false);
+    setFinishSuccess(false);
+    setCurrent(target);
+  };
+
   const goPrev = () =>
-    setCurrent((s) => (s > FIRST_STEP ? ((s - 1) as StepId) : s));
-  const goNext = () =>
+    setCurrent((s) => {
+      setFinishWarning(false);
+      setFinishSuccess(false);
+      return s > FIRST_STEP ? ((s - 1) as StepId) : s;
+    });
+
+  const goNext = () => {
+    setFinishWarning(false);
+    setFinishSuccess(false);
     setCurrent((s) => (s < LAST_STEP ? ((s + 1) as StepId) : s));
+  };
+
+  const handleFinish = () => {
+    if (!canProceedToResults(state)) {
+      setFinishSuccess(false);
+      setFinishWarning(true);
+      return;
+    }
+    setFinishWarning(false);
+    setFinishSuccess(true);
+
+    // 모바일·태블릿: 미리보기 시트를 자동으로 연다
+    if (window.matchMedia("(max-width: 1023px)").matches) {
+      setPreviewOpen(true);
+    }
+  };
 
   return (
     <div className="flex min-h-dvh flex-col">
-      <Header current={current} onSelect={setCurrent} saveStatus="idle" />
+      <Header
+        current={current}
+        completedSteps={completedSteps}
+        onSelect={goToStep}
+        saveStatus={saveStatus}
+      />
+
+      {finishSuccess && current === 4 && (
+        <div className="border-b border-accent/30 bg-accent-soft/30 px-4 py-3">
+          <div className="mx-auto max-w-[1600px]">
+            <FinishSuccessAlert />
+          </div>
+        </div>
+      )}
+
+      {finishWarning && current === 4 && (
+        <div className="border-b border-warn/30 bg-warn/5 px-4 py-3">
+          <div className="mx-auto max-w-[1600px]">
+            <ValidationAlert
+              items={incompleteFields}
+              title="명세서를 받기 전에 아래 항목을 모두 입력해 주세요"
+            />
+          </div>
+        </div>
+      )}
 
       <div className="mx-auto flex w-full max-w-[1600px] flex-1 flex-col lg:flex-row lg:gap-0">
         <main className="min-w-0 flex-1 overflow-y-auto p-4 sm:p-6">
           <StepCard step={step}>
-            <StepBody step={step.id} />
+            <StepBody step={step.id} finishSuccess={finishSuccess && current === 4} />
           </StepCard>
         </main>
 
-        {/* 데스크톱: 우측 고정 미리보기 */}
         <aside className="hidden w-[420px] shrink-0 border-l border-line lg:block xl:w-[480px]">
           <div className="sticky top-14 h-[calc(100dvh-3.5rem)]">
             <PreviewPane />
@@ -44,10 +112,14 @@ export function PlannerShell() {
         </aside>
       </div>
 
-      <BottomNav current={current} onPrev={goPrev} onNext={goNext} />
+      <BottomNav
+        current={current}
+        onPrev={goPrev}
+        onNext={goNext}
+        onFinish={handleFinish}
+      />
       <Footer />
 
-      {/* 모바일·태블릿: 하단 시트로 전환 */}
       <button
         type="button"
         onClick={() => setPreviewOpen(true)}

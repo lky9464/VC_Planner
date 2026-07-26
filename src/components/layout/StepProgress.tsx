@@ -5,16 +5,19 @@ import { STEPS, type StepId } from "@/lib/steps";
 
 type Props = {
   current: StepId;
+  completedSteps: Record<StepId, boolean>;
   onSelect: (step: StepId) => void;
 };
 
-/** 진행바. 각 Step은 클릭으로 바로 이동할 수 있다 (선형 강제 아님, Plan 4장) */
-export function StepProgress({ current, onSelect }: Props) {
+/**
+ * 진행바. Step 완료 시에만 좌측 체크 표시 (모든 항목 입력 완료 기준).
+ */
+export function StepProgress({ current, completedSteps, onSelect }: Props) {
   return (
     <nav aria-label="진행 단계" className="flex items-center gap-1 sm:gap-2">
       {STEPS.map((step, index) => {
         const isCurrent = step.id === current;
-        const isDone = step.id < current;
+        const isComplete = completedSteps[step.id];
 
         return (
           <div key={step.id} className="flex items-center gap-1 sm:gap-2">
@@ -22,7 +25,7 @@ export function StepProgress({ current, onSelect }: Props) {
               <span
                 aria-hidden
                 className={`h-px w-3 sm:w-6 ${
-                  isDone || isCurrent ? "bg-accent/60" : "bg-line"
+                  isComplete || isCurrent ? "bg-accent/60" : "bg-line"
                 }`}
               />
             )}
@@ -40,12 +43,16 @@ export function StepProgress({ current, onSelect }: Props) {
                 className={`flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${
                   isCurrent
                     ? "bg-accent text-bg"
-                    : isDone
+                    : isComplete
                       ? "bg-accent/25 text-accent"
                       : "bg-surface-2 text-muted"
                 }`}
               >
-                {isDone ? <Check className="size-3.5" aria-hidden /> : step.id}
+                {isComplete ? (
+                  <Check className="size-3.5" aria-hidden />
+                ) : (
+                  step.id
+                )}
               </span>
               <span className="hidden whitespace-nowrap sm:inline">
                 {step.shortLabel}

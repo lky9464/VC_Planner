@@ -1,5 +1,10 @@
+import { ProjectProvider } from "@/context/ProjectContext";
 import { PlannerShell } from "@/components/layout/PlannerShell";
 
 export default function Home() {
-  return <PlannerShell />;
+  return (
+    <ProjectProvider>
+      <PlannerShell />
+    </ProjectProvider>
+  );
 }
