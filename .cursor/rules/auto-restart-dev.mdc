@@ -1,0 +1,25 @@
+---
+description: 코드 변경 후 dev 서버 자동 재시작
+alwaysApply: true
+---
+
+# dev 서버 자동 재시작
+
+코드를 작성·수정한 뒤에는 **항상** dev 서버를 재시작한다. 사용자 확인 요청 여부와 관계없이 적용한다.
+
+## 재시작 절차
+
+1. 포트 3000 사용 중인 기존 `next dev` 프로세스 종료
+2. `npm run dev`를 백그라운드로 새로 실행
+3. `Ready in` 로그 또는 `http://localhost:3000/` **200 OK**까지 대기
+
+**주의**: `npm run build` 직후에는 dev 서버를 반드시 재시작한다. build가 `.next`를 갱신하면 실행 중인 dev 서버가 500 Internal Server Error를 낸다.
+
+## 적용 대상
+
+- `src/`, `public/`, `next.config.ts` 등 앱 동작에 영향 있는 파일 변경
+- Agent가 여러 파일을 연속 수정한 경우에도 **마지막 변경 후 1회** 재시작
+
+## 재시작 생략
+
+- `Plan.md`, `docs/`, `README.md`, `.cursor/rules/` 등 문서·규칙만 수정한 경우

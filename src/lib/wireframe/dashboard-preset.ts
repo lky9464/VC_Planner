@@ -1,6 +1,10 @@
 import type { WireframeItem } from "@/lib/types/project";
 
-/** Plan 6-1 예시 레이아웃 — 대시보드형 CRUD 화면 */
+/**
+ * Plan 6-1 1-3 — 공통 화면 틀 프리셋
+ * 12열 그리드: 네비(h:1) + 본문(h:5) = 총 6행
+ * - 사이드바 w:3 (25%) · 검색 h:1 · 컨텐츠 h:4 (본문 80%)
+ */
 export function createDashboardWireframePreset(): WireframeItem[] {
   return [
     {
@@ -17,7 +21,7 @@ export function createDashboardWireframePreset(): WireframeItem[] {
       x: 0,
       y: 1,
       w: 3,
-      h: 4,
+      h: 5,
       type: "sidebar",
       label: "메뉴",
     },
@@ -31,22 +35,13 @@ export function createDashboardWireframePreset(): WireframeItem[] {
       label: "조건 입력",
     },
     {
-      i: "wf-kpi",
+      i: "wf-content",
       x: 3,
       y: 2,
       w: 9,
-      h: 1,
-      type: "kpi",
-      label: "요약 3종",
-    },
-    {
-      i: "wf-table",
-      x: 3,
-      y: 3,
-      w: 9,
-      h: 2,
-      type: "table",
-      label: "결과 목록",
+      h: 4,
+      type: "content",
+      label: "화면별 컨텐츠",
     },
   ];
 }

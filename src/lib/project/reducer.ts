@@ -8,6 +8,7 @@ import type {
 import { createInitialState, createStep2RecommendedValues, ensureRecommendedGuardrails } from "./defaults";
 import { createCrudFlowPreset } from "@/lib/flowchart/crud-preset";
 import { createDashboardWireframePreset } from "@/lib/wireframe/dashboard-preset";
+import { normalizeWireframeItems } from "@/lib/wireframe/constants";
 import { setChoiceValue } from "./choice-path";
 import { SCHEMA_VERSION } from "./constants";
 import type { ChoiceValue } from "@/lib/types/project";
@@ -79,7 +80,11 @@ function normalizeHydratedState(raw: unknown): ProjectState {
     },
     basic: { ...initial.basic, ...data.basic },
     flowchart: { ...initial.flowchart, ...data.flowchart },
-    wireframe: { ...initial.wireframe, ...data.wireframe },
+    wireframe: {
+      ...initial.wireframe,
+      ...data.wireframe,
+      items: normalizeWireframeItems(data.wireframe?.items),
+    },
     dataIO: { ...initial.dataIO, ...data.dataIO },
     edgeCases: { ...initial.edgeCases, ...data.edgeCases },
     tech: { ...initial.tech, ...data.tech },

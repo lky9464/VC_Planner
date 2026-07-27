@@ -118,12 +118,15 @@ function Step1Fields() {
 
       <section className="space-y-4">
         <h3 className="text-xs font-semibold uppercase tracking-wide text-muted">
-          화면 구성 (와이어프레임)
+          대표 화면 레이아웃 (와이어프레임)
         </h3>
         <WireframeEditor
           items={state.wireframe.items}
           cols={state.wireframe.cols}
           rowHeight={state.wireframe.rowHeight}
+          flowchartPageCount={
+            state.flowchart.nodes.filter((node) => node.type === "page").length
+          }
           onChange={setWireframe}
           onApplyDashboardPreset={applyDashboardWireframePreset}
         />

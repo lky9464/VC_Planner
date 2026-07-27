@@ -22,6 +22,8 @@ type Props = {
   items: WireframeItem[];
   cols?: number;
   rowHeight?: number;
+  /** 업무 흐름도의 기능·페이지 노드 수 — 안내 문구용 */
+  flowchartPageCount?: number;
   onChange: (items: WireframeItem[]) => void;
   onApplyDashboardPreset: () => void;
 };
@@ -52,6 +54,7 @@ export function WireframeEditor({
   items,
   cols = WIREFRAME_COLS,
   rowHeight = WIREFRAME_ROW_HEIGHT,
+  flowchartPageCount = 0,
   onChange,
   onApplyDashboardPreset,
 }: Props) {
@@ -129,6 +132,43 @@ export function WireframeEditor({
 
   return (
     <div className="space-y-3">
+      <div
+        className="space-y-2 rounded-lg border border-accent/25 bg-accent-soft/20 px-3 py-2.5 text-xs leading-relaxed text-fg"
+        role="note"
+      >
+        <p className="font-medium">
+          화면이 여러 개여도{" "}
+          <span className="text-accent">대표 1장만</span> 그리면 됩니다.
+        </p>
+        <p className="text-muted">
+          업무 흐름도는 화면 개수와 이동 경로를, 와이어프레임은{" "}
+          <strong className="font-medium text-fg">한 장의 배치</strong>
+          를 설명합니다. 나머지 화면은 흐름도에 적힌 이름을 AI가 참고합니다.
+        </p>
+        <ul className="list-inside list-disc space-y-0.5 text-muted">
+          <li>
+            그리기 좋은 화면:{" "}
+            <strong className="font-medium text-fg">메인(시작) 화면</strong>,{" "}
+            <strong className="font-medium text-fg">가장 복잡한 화면</strong>,{" "}
+            또는{" "}
+            <strong className="font-medium text-fg">
+              네비+메뉴+본문 공통 틀
+            </strong>
+          </li>
+          <li>
+            그리지 않아도 됨: 기능별 상세 화면 각각 (흐름도 노드 이름으로
+            충분)
+          </li>
+        </ul>
+        {flowchartPageCount >= 2 && (
+          <p className="rounded-md border border-accent/30 bg-bg/60 px-2 py-1.5 text-accent">
+            흐름도에 페이지 {flowchartPageCount}개가 있습니다. 와이어프레임은
+            그중 <strong className="font-semibold">대표 1장</strong>만
+            그리세요.
+          </p>
+        )}
+      </div>
+
       <div className="flex flex-wrap items-center gap-2">
         <button
           type="button"
@@ -155,7 +195,7 @@ export function WireframeEditor({
 
       <div
         aria-label="와이어프레임 팔레트"
-        className="grid grid-cols-2 gap-2 sm:grid-cols-4 md:grid-cols-8"
+        className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-5"
       >
         {WIREFRAME_PALETTE.map(({ type, label, hint }) => (
           <button
@@ -210,9 +250,14 @@ export function WireframeEditor({
         )}
 
         {items.length === 0 && (
-          <p className="pointer-events-none absolute inset-0 flex items-center justify-center text-xs text-muted">
-            팔레트에서 컴포넌트를 클릭해 화면을 구성하세요
-          </p>
+          <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-1 px-6 text-center text-xs text-muted">
+            <p>
+              ✨ 기본 불러오기로 공통 틀을 불러오거나, 팔레트로{" "}
+              <strong className="font-medium text-fg">대표 화면 1장</strong>을
+              구성하세요
+            </p>
+            <p>모든 화면을 각각 그릴 필요는 없습니다</p>
+          </div>
         )}
       </div>
     </div>

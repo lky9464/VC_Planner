@@ -23,6 +23,11 @@
 # misc
 .DS_Store
 *.pem
+.cursor/.dev-restart-ts
+
+# local-only dev scripts (not for GitHub)
+/start-dev-server.bat
+/restart-dev-server.bat
 
 # debug
 npm-debug.log*

@@ -244,12 +244,81 @@ function FlowchartCanvas({ nodes, edges, onChange, onApplyCrudPreset }: Props) {
     [nodes, edges, onChange],
   );
 
+  const pageCount = useMemo(
+    () => nodes.filter((node) => node.type === "page").length,
+    [nodes],
+  );
+
   const handleClear = useCallback(() => {
     onChange([], []);
   }, [onChange]);
 
   return (
     <div className="space-y-3">
+      <div
+        className="space-y-2 rounded-lg border border-accent/25 bg-accent-soft/20 px-3 py-2.5 text-xs leading-relaxed text-fg"
+        role="note"
+      >
+        <p className="font-medium">
+          서비스의{" "}
+          <span className="text-accent">모든 화면과 이동 경로</span>를
+          흐름도에 적어 주세요.
+        </p>
+        <p className="text-muted">
+          와이어프레임은 <strong className="font-medium text-fg">대표 1장의 배치</strong>
+          를, 업무 흐름도는{" "}
+          <strong className="font-medium text-fg">
+            화면 개수 · 이동 · DB 연결
+          </strong>
+          을 설명합니다. AI는 여기 적힌{" "}
+          <strong className="font-medium text-fg">기능·페이지</strong> 이름으로
+          나머지 화면을 만듭니다.
+        </p>
+        <ul className="list-inside list-disc space-y-0.5 text-muted">
+          <li>
+            넣기:{" "}
+            <strong className="font-medium text-fg">시작점</strong> →{" "}
+            <strong className="font-medium text-fg">기능·페이지</strong>
+            (메인, 기능1, 기능2…) → 필요 시{" "}
+            <strong className="font-medium text-fg">DB</strong> →{" "}
+            <strong className="font-medium text-fg">종료점</strong>
+          </li>
+          <li>
+            화살표: 사용자가{" "}
+            <strong className="font-medium text-fg">어디로 이동</strong>하고{" "}
+            <strong className="font-medium text-fg">언제 저장</strong>하는지
+          </li>
+          <li>
+            페이지 이름:{" "}
+            <strong className="font-medium text-fg">메인 화면</strong>,{" "}
+            <strong className="font-medium text-fg">기능1: 설정</strong>처럼
+            무엇을 하는 화면인지 적기
+          </li>
+          <li>
+            완벽할 필요 없음:{" "}
+            <strong className="font-medium text-fg">
+              대표적인 이용 순서 1~2개
+            </strong>
+            만 그려도 충분
+          </li>
+        </ul>
+        {pageCount >= 2 && (
+          <p className="rounded-md border border-accent/30 bg-bg/60 px-2 py-1.5 text-accent">
+            페이지 {pageCount}개를 그렸습니다.{" "}
+            <strong className="font-semibold">와이어프레임</strong>에는 그중{" "}
+            <strong className="font-semibold">대표 1장</strong>만 그리면
+            됩니다.
+          </p>
+        )}
+        {pageCount === 1 && nodes.length > 0 && (
+          <p className="rounded-md border border-accent/30 bg-bg/60 px-2 py-1.5 text-accent">
+            페이지 1개입니다.{" "}
+            <strong className="font-semibold">와이어프레임</strong>에 이 화면을
+            그리면 됩니다.
+          </p>
+        )}
+      </div>
+
       <div className="flex flex-wrap items-center gap-2">
         <button
           type="button"
@@ -294,7 +363,16 @@ function FlowchartCanvas({ nodes, edges, onChange, onApplyCrudPreset }: Props) {
         ))}
       </div>
 
-      <div className="h-[320px] min-h-[280px] w-full overflow-hidden rounded-lg border border-line bg-bg">
+      <div className="relative h-[320px] min-h-[280px] w-full overflow-hidden rounded-lg border border-line bg-bg">
+        {nodes.length === 0 && (
+          <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center gap-1 px-6 text-center text-xs text-muted">
+            <p>
+              ✨ 기본 불러오기로 시작하거나, 팔레트 노드를 캔버스로{" "}
+              <strong className="font-medium text-fg">드래그</strong>하세요
+            </p>
+            <p>화면(페이지)마다 기능·페이지 노드를 추가하고 연결합니다</p>
+          </div>
+        )}
         <ReactFlow
           nodes={rfNodes}
           edges={rfEdges}

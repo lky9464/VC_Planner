@@ -5,15 +5,7 @@ alwaysApply: true
 
 # 사용자 확인 요청 워크플로
 
-코드 작성·수정 후 사용자에게 브라우저 동작 확인을 요청할 때, **먼저 dev 서버를 재시작**한 뒤 확인 항목을 안내한다.
-
-## dev 서버 재시작 (필수)
-
-1. 포트 3000 사용 중인 기존 `next dev` 프로세스 종료
-2. `npm run dev`를 백그라운드로 새로 실행
-3. `Ready in` 로그 또는 `http://localhost:3000/` **200 OK**까지 대기
-
-**주의**: `npm run build` 직후에는 dev 서버를 반드시 재시작한다. build가 `.next`를 갱신하면 실행 중인 dev 서버가 500 Internal Server Error를 낸다.
+코드 작성·수정 후 사용자에게 브라우저 동작 확인을 요청할 때, `auto-restart-dev` 규칙에 따라 **먼저 dev 서버를 재시작**한 뒤 확인 항목을 안내한다.
 
 ## 확인 요청 문구
 

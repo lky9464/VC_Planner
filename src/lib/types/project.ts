@@ -36,15 +36,7 @@ export type WireframeItem = {
   y: number;
   w: number;
   h: number;
-  type:
-    | "navbar"
-    | "sidebar"
-    | "search"
-    | "table"
-    | "kpi"
-    | "buttons"
-    | "chart"
-    | "custom";
+  type: "navbar" | "sidebar" | "search" | "content" | "custom";
   label: string;
 };
 

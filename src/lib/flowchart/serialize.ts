@@ -114,10 +114,15 @@ export function renderFlowchartMarkdown(
     return "_(아직 그린 업무 흐름이 없습니다)_";
   }
 
+  const intro =
+    "아래는 서비스의 **화면 개수·이동 경로·DB 연결**을 나타냅니다. 와이어프레임의 대표 1장과 함께 Agent가 전체 화면을 구현합니다.";
+
   const textFlow = buildTextFlow(nodes, edges);
   const branching = hasBranching(edges);
 
   return [
+    intro,
+    "",
     branching
       ? "**텍스트 흐름** (분기 — 모든 연결):"
       : "**텍스트 흐름**:",

@@ -74,7 +74,7 @@ export function generatePromptMarkdown(state: ProjectState): string {
     "",
     renderFlowchartMarkdown(flowchart.nodes, flowchart.edges),
     "",
-    "### 3-2. 화면 구성",
+    "### 3-2. 화면 구성 (대표 1장)",
     "",
     renderWireframeMarkdown(wireframe.items, wireframe.cols),
     "",

@@ -140,13 +140,18 @@ export function renderWireframeMarkdown(
   cols: number,
 ): string {
   if (items.length === 0) {
-    return "_(아직 배치한 화면 구성이 없습니다)_";
+    return "_(아직 배치한 대표 화면 레이아웃이 없습니다)_";
   }
+
+  const intro =
+    "아래는 **대표 화면 1장**(또는 공통 레이아웃)의 배치입니다. 업무 흐름도의 다른 페이지는 이 틀을 참고해 Agent가 구현합니다.";
 
   const ascii = buildAsciiDiagram(items, cols);
   const table = buildComponentTable(items);
 
   return [
+    intro,
+    "",
     "**ASCII 레이아웃 도식**:",
     "",
     "```",
