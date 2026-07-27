@@ -30,12 +30,17 @@ import {
   createFlowNodeId,
 } from "@/lib/flowchart/constants";
 import { flowNodeTypes } from "./FlowNodes";
+import { DeliveryNotesField } from "@/components/inputs/DeliveryNotesField";
 
 type Props = {
   nodes: FlowNode[];
   edges: FlowEdge[];
+  deliveryNotes: string;
   onChange: (nodes: FlowNode[], edges: FlowEdge[]) => void;
+  onDeliveryNotesChange: (notes: string) => void;
   onApplyCrudPreset: () => void;
+  /** PDF 캡처 — 캔버스만 표시 */
+  readOnly?: boolean;
 };
 
 function toReactFlowNodes(
@@ -91,7 +96,15 @@ function FitViewWhenNodesChange({ count }: { count: number }) {
   return null;
 }
 
-function FlowchartCanvas({ nodes, edges, onChange, onApplyCrudPreset }: Props) {
+function FlowchartCanvas({
+  nodes,
+  edges,
+  deliveryNotes,
+  onChange,
+  onDeliveryNotesChange,
+  onApplyCrudPreset,
+  readOnly = false,
+}: Props) {
   const { screenToFlowPosition } = useReactFlow();
   const syncingFromParent = useRef(false);
   const isDragging = useRef(false);
@@ -251,7 +264,49 @@ function FlowchartCanvas({ nodes, edges, onChange, onApplyCrudPreset }: Props) {
 
   const handleClear = useCallback(() => {
     onChange([], []);
-  }, [onChange]);
+    onDeliveryNotesChange("");
+  }, [onChange, onDeliveryNotesChange]);
+
+  if (readOnly) {
+    return (
+      <div className="space-y-3">
+        <div className="relative h-[320px] min-h-[280px] w-full overflow-hidden rounded-lg border border-line bg-bg">
+          {nodes.length === 0 ? (
+            <div className="pointer-events-none absolute inset-0 flex items-center justify-center px-6 text-center text-xs text-muted">
+              (업무 흐름도가 비어 있습니다)
+            </div>
+          ) : (
+            <ReactFlow
+              nodes={rfNodes}
+              edges={rfEdges}
+              nodeTypes={flowNodeTypes as NodeTypes}
+              nodesDraggable={false}
+              nodesConnectable={false}
+              elementsSelectable={false}
+              panOnDrag={false}
+              zoomOnScroll={false}
+              zoomOnPinch={false}
+              preventScrolling
+              proOptions={{ hideAttribution: true }}
+              style={{ width: "100%", height: "100%" }}
+            >
+              <Background color="var(--border)" gap={16} />
+              <FitViewWhenNodesChange count={rfNodes.length} />
+            </ReactFlow>
+          )}
+        </div>
+
+        <DeliveryNotesField
+          inputId="flowchart-delivery-notes-print"
+          value={deliveryNotes}
+          onChange={onDeliveryNotesChange}
+          readOnly
+          description="흐름도만으로는 전달하기 어려운 설명·특이사항·주의할 점을 적어 주세요. Agent에게 그대로 전달됩니다."
+          placeholder="예) 사용자가 종료할 때까지 종료하지 않음, DB는 필요한 경우에만 사용 등"
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-3">
@@ -400,6 +455,14 @@ function FlowchartCanvas({ nodes, edges, onChange, onApplyCrudPreset }: Props) {
           <FitViewWhenNodesChange count={rfNodes.length} />
         </ReactFlow>
       </div>
+
+      <DeliveryNotesField
+        inputId="flowchart-delivery-notes"
+        value={deliveryNotes}
+        onChange={onDeliveryNotesChange}
+        description="흐름도만으로는 전달하기 어려운 설명·특이사항·주의할 점을 적어 주세요. Agent에게 그대로 전달됩니다."
+        placeholder="예) 사용자가 종료할 때까지 종료하지 않음, DB는 필요한 경우에만 사용 등"
+      />
     </div>
   );
 }

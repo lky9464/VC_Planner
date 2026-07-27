@@ -15,7 +15,8 @@ export function FinishSuccessAlert() {
       </p>
       <p className="mt-1.5 text-xs leading-relaxed text-muted">
         오른쪽 <strong className="text-fg">Prompt.md 미리보기</strong>에서
-        내용을 확인하세요. 복사·파일 다운로드·PDF는 Phase 6에서 연결됩니다.
+        내용을 확인한 뒤, 아래에서 Agent 규칙 복사·Prompt 파일 다운로드를
+        받을 수 있습니다.
         (모바일은 하단 <strong className="text-fg">미리보기</strong> 버튼)
       </p>
     </div>

@@ -109,9 +109,20 @@ export function buildMermaidFlowchart(
 export function renderFlowchartMarkdown(
   nodes: FlowNode[],
   edges: FlowEdge[],
+  deliveryNotes = "",
 ): string {
-  if (nodes.length === 0) {
+  if (nodes.length === 0 && !deliveryNotes.trim()) {
     return "_(아직 그린 업무 흐름이 없습니다)_";
+  }
+
+  if (nodes.length === 0) {
+    return [
+      "_(아직 그린 업무 흐름이 없습니다)_",
+      "",
+      "**전달 사항 (작성자 메모)**:",
+      "",
+      deliveryNotes.trim(),
+    ].join("\n");
   }
 
   const intro =
@@ -120,7 +131,7 @@ export function renderFlowchartMarkdown(
   const textFlow = buildTextFlow(nodes, edges);
   const branching = hasBranching(edges);
 
-  return [
+  const lines = [
     intro,
     "",
     branching
@@ -131,5 +142,12 @@ export function renderFlowchartMarkdown(
     "**Mermaid** (아래 코드에 모든 화살표가 포함됩니다):",
     "",
     buildMermaidFlowchart(nodes, edges),
-  ].join("\n");
+  ];
+
+  const notes = deliveryNotes.trim();
+  if (notes) {
+    lines.push("", "**전달 사항 (작성자 메모)**:", "", notes);
+  }
+
+  return lines.join("\n");
 }

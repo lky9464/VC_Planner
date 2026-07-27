@@ -8,9 +8,12 @@ import { Footer } from "./Footer";
 import { BottomNav } from "./BottomNav";
 import { ValidationAlert } from "./ValidationAlert";
 import { FinishSuccessAlert } from "./FinishSuccessAlert";
+import { PreviewDrawer } from "./PreviewDrawer";
 import { PreviewPane } from "@/components/preview/PreviewPane";
 import { StepCard } from "@/components/steps/StepCard";
 import { StepBody } from "@/components/steps/StepBody";
+import { DelegationBanner } from "@/components/export/DelegationBanner";
+import { collectDelegatedItems } from "@/lib/markdown/render-delegation";
 import { FIRST_STEP, LAST_STEP, STEPS, type StepId } from "@/lib/steps";
 import {
   canProceedToResults,
@@ -33,6 +36,7 @@ export function PlannerShell() {
 
   const completedSteps = useMemo(() => getStepCompletionMap(state), [state]);
   const incompleteFields = useMemo(() => getIncompleteFields(state), [state]);
+  const delegatedItems = useMemo(() => collectDelegatedItems(state), [state]);
 
   const step = STEPS.find((s) => s.id === current) ?? STEPS[0];
 
@@ -79,6 +83,14 @@ export function PlannerShell() {
         saveStatus={saveStatus}
       />
 
+      {current === 4 && delegatedItems.length > 0 && (
+        <div className="border-b border-accent/25 bg-accent-soft/20 px-4 py-3">
+          <div className="mx-auto max-w-[1600px]">
+            <DelegationBanner items={delegatedItems} />
+          </div>
+        </div>
+      )}
+
       {finishSuccess && current === 4 && (
         <div className="border-b border-accent/30 bg-accent-soft/30 px-4 py-3">
           <div className="mx-auto max-w-[1600px]">
@@ -105,11 +117,7 @@ export function PlannerShell() {
           </StepCard>
         </main>
 
-        <aside className="hidden w-[420px] shrink-0 border-l border-line lg:block xl:w-[480px]">
-          <div className="sticky top-14 h-[calc(100dvh-3.5rem)]">
-            <PreviewPane />
-          </div>
-        </aside>
+        <PreviewDrawer />
       </div>
 
       <BottomNav

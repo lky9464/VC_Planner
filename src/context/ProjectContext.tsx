@@ -34,9 +34,15 @@ type ProjectContextValue = {
   setBasicText: (field: "serviceName" | "oneLiner", value: string) => void;
   applyStep2Defaults: () => void;
   setFlowchart: (nodes: FlowNode[], edges: FlowEdge[]) => void;
+  setFlowchartDeliveryNotes: (notes: string) => void;
   applyCrudFlowPreset: () => void;
   setWireframe: (items: WireframeItem[]) => void;
+  setWireframeDeliveryNotes: (notes: string) => void;
   applyDashboardWireframePreset: () => void;
+  setOutputOption: (
+    field: "includeToolAppendix" | "targetAgents",
+    value: boolean | string[],
+  ) => void;
   resetProject: () => void;
 };
 
@@ -111,6 +117,10 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
     dispatch({ type: "SET_FLOWCHART", nodes, edges });
   }, []);
 
+  const setFlowchartDeliveryNotes = useCallback((notes: string) => {
+    dispatch({ type: "SET_FLOWCHART_DELIVERY_NOTES", notes });
+  }, []);
+
   const applyCrudFlowPreset = useCallback(() => {
     dispatch({ type: "APPLY_CRUD_FLOW_PRESET" });
   }, []);
@@ -119,9 +129,23 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
     dispatch({ type: "SET_WIREFRAME", items });
   }, []);
 
+  const setWireframeDeliveryNotes = useCallback((notes: string) => {
+    dispatch({ type: "SET_WIREFRAME_DELIVERY_NOTES", notes });
+  }, []);
+
   const applyDashboardWireframePreset = useCallback(() => {
     dispatch({ type: "APPLY_DASHBOARD_WIREFRAME_PRESET" });
   }, []);
+
+  const setOutputOption = useCallback(
+    (
+      field: "includeToolAppendix" | "targetAgents",
+      value: boolean | string[],
+    ) => {
+      dispatch({ type: "SET_OUTPUT", field, value });
+    },
+    [],
+  );
 
   const resetProject = useCallback(() => {
     dispatch({ type: "RESET" });
@@ -137,9 +161,12 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
       setBasicText,
       applyStep2Defaults,
       setFlowchart,
+      setFlowchartDeliveryNotes,
       applyCrudFlowPreset,
       setWireframe,
+      setWireframeDeliveryNotes,
       applyDashboardWireframePreset,
+      setOutputOption,
       resetProject,
     }),
     [
@@ -150,9 +177,12 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
       setBasicText,
       applyStep2Defaults,
       setFlowchart,
+      setFlowchartDeliveryNotes,
       applyCrudFlowPreset,
       setWireframe,
+      setWireframeDeliveryNotes,
       applyDashboardWireframePreset,
+      setOutputOption,
       resetProject,
     ],
   );

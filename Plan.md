@@ -2,11 +2,13 @@
 
 > **서비스명**: VC Planner
 > **한 줄 설명**: 비개발자가 단계별 질문·플로우차트·와이어프레임으로 서비스를 설계하고, 어떤 AI Coding Agent에도 붙여넣을 수 있는 표준 Markdown 개발 명세서(`Prompt.md` + Agent 규칙 파일)를 생성하는 웹 서비스
-> **문서 버전**: v1.2
+> **문서 버전**: v1.4
 > **변경 이력**:
 > - v1.0 — 초안
 > - v1.1 — ① `[✨ AI 추천]` 버튼 의미 확정(다운스트림 Agent 위임) ② Agent 범용성(도구 비종속 표준 Markdown) 요구사항 추가 ③ Cloudflare Pages 배포·라이선스·소스 보호 가드레일 추가 ④ 개발 환경 버전 정보 확정 기록
 > - v1.2 — ① 와이어프레임 팔레트 8종→5종(`content` 추가, table/kpi/buttons/chart 제거) ② 기본 불러오기를 공통 화면 틀 프리셋으로 변경 ③ 대표 화면 1장·업무 흐름도 작성 요령 UI ④ Prompt.md 3-1·3-2 서두 문구
+> - v1.3 — ① 업무 흐름도·와이어프레임 캔버스 아래 `전달 사항(선택)` 입력란 ② Prompt.md 3-1·3-2에 작성자 메모 반영 ③ Step 4에서 `[📋 전체 프롬프트 복사]` 제거(Prompt.md·txt 다운로드와 중복)
+> - v1.4 — ① Phase 6 완료(Step 4 출력·DoD 확인) ② Phase 7 마감(README·미리보기 서랍) ③ **PDF 리포트는 v1 배포 후 선택 과제로 연기**(UI·`html2pdf.js` 미포함) ④ Step 4 UI: Agent 도구 선택 → Prompt / Rule 2줄 배치
 
 ---
 
@@ -131,14 +133,14 @@ npm 레지스트리 실측 최신 버전(참고용): `next 16.2.12` / `react 19.
 | 아이콘 | `lucide-react` | UI 아이콘 |
 | 플로우차트 | `@xyflow/react` v12.11+ | Step 1-2 업무 흐름도 |
 | 와이어프레임 | `react-grid-layout` v2.2+ | Step 1-3 화면 레이아웃 |
-| PDF | `html2pdf.js` (`jspdf` + `html2canvas`) | Step 4 PDF 리포트 |
+| PDF (선택) | `html2pdf.js` (배포 후 검토) | Step 4 PDF — **v1 미포함**, 필요 시 Phase 8 이후 [G8] |
 | 상태 관리 | React Context + `useReducer` (필요 시 `zustand`) | 위저드 전역 상태 |
 
 ### 3-2. 버전 고정 정책 [G2]
 
 **결정**: **Next.js 15 (App Router) + React 19** 조합으로 진행한다.
 
-Next.js 16이 이미 공개되어 있으나, 본 프로젝트는 `@xyflow/react`·`react-grid-layout`·`html2pdf.js` 같은 브라우저 의존 라이브러리를 Static Export 위에서 돌려야 하므로 **검증 사례가 많은 15 계열을 유지**한다. 16으로 올리는 것은 v1 완료 후 별도 승인 사항으로 미룬다 [G2][G8].
+Next.js 16이 이미 공개되어 있으나, 본 프로젝트는 `@xyflow/react`·`react-grid-layout` 같은 브라우저 의존 라이브러리를 Static Export 위에서 돌려야 하므로 **검증 사례가 많은 15 계열을 유지**한다. 16으로 올리는 것은 v1 완료 후 별도 승인 사항으로 미룬다 [G2][G8].
 
 두 핵심 라이브러리 모두 이 조합에서 우회 플래그 없이 설치·동작한다.
 
@@ -156,7 +158,7 @@ Next.js 16이 이미 공개되어 있으나, 본 프로젝트는 `@xyflow/react`
 **대비책**: 만약 `react-grid-layout` v2에서 예기치 못한 문제가 생기면 `@dnd-kit/core` + `react-rnd` 조합으로 교체한다. 단 그리드 스냅·충돌 회피를 직접 구현해야 해 Phase 5 공수가 늘어나므로, 교체는 사전 승인 후에만 한다.
 
 ### 3-3. 클라이언트 전용 처리
-`@xyflow/react`, `react-grid-layout`, `html2pdf.js`는 모두 브라우저 API에 의존한다.
+`@xyflow/react`, `react-grid-layout`은 브라우저 API에 의존한다.
 → `next/dynamic`의 `ssr: false`로 동적 로드하고, 컴포넌트에 `'use client'`를 명시한다.
 
 ### 3-4. LocalStorage 하이드레이션
@@ -218,7 +220,7 @@ $OutputEncoding = [System.Text.UTF8Encoding]::new()
 └──────────────────────────────────────────────────────────────┘
 ```
 
-- 데스크톱: 좌측 위저드 / 우측 미리보기 2단 분할
+- 데스크톱: 좌측 위저드 / 우측 미리보기 2단 분할. **미리보기는 서랍 형태**로 접었다 펼 수 있으며 **기본은 열림**(LocalStorage에 상태 저장, lg 이상)
 - 모바일·태블릿: 미리보기를 하단 시트로 전환
 - 진행바의 각 Step은 클릭으로 이동 가능 (선형 강제 아님)
 - 푸터는 전 화면 공통이며 라이선스 고지 + 로컬 저장 안내를 함께 노출한다 [G12]
@@ -277,8 +279,13 @@ type ProjectState = {
     domain: ChoiceValue;        // 일반IT/금융회계/공공행정/헬스케어/커머스/직접입력
     sensitiveData: ChoiceValue; // 일반/민감포함/직접입력
   };
-  flowchart: { nodes: FlowNode[]; edges: FlowEdge[] };
-  wireframe: { items: WireframeItem[]; cols: number; rowHeight: number };
+  flowchart: { nodes: FlowNode[]; edges: FlowEdge[]; deliveryNotes: string };
+  wireframe: {
+    items: WireframeItem[];
+    cols: number;
+    rowHeight: number;
+    deliveryNotes: string;
+  };
   dataIO: { input: ChoiceValue; output: ChoiceValue };
   edgeCases: { emptyState: ChoiceValue; errorState: ChoiceValue };
 
@@ -336,7 +343,8 @@ type WireframeItem = {
 - 노드 타입: `시작점` / `기능·페이지` / `데이터 저장·DB` / `조건 분기` / `종료점`
 - 팔레트에서 캔버스로 드래그하여 추가, 노드 더블클릭으로 이름 편집, 핸들을 끌어 연결
 - `[✨ 기본 불러오기]`: 시작 → 목록 → 등록/수정/삭제 → DB → 종료 CRUD 프리셋 삽입
-- 마크다운 변환: 노드·엣지 목록을 텍스트 흐름(`A → B → C`) 및 Mermaid `flowchart TD` 블록으로 출력. 3-1 서두에 흐름도 역할 설명 1문장을 자동 삽입한다.
+- 캔버스 **아래** `전달 사항(선택)` 여러 줄 입력란 — 흐름도만으로 전달하기 어려운 설명·특이사항·주의할 점. 비워 두면 Prompt.md에 생략한다.
+- 마크다운 변환: 노드·엣지 목록을 텍스트 흐름(`A → B → C`) 및 Mermaid `flowchart TD` 블록으로 출력. 3-1 서두에 흐름도 역할 설명 1문장을 자동 삽입한다. 전달 사항이 있으면 3-1 맨 아래 `**전달 사항 (작성자 메모)**` 블록으로 붙인다.
 
 **1-3. Wireframe 에디터 (react-grid-layout)**
 
@@ -355,6 +363,7 @@ type WireframeItem = {
 | 화면별 컨텐츠 | 3 | 2 | 9 | 4 | 우측 본문, 검색창 아래 대부분 |
 
 - **ASCII 변환**: 그리드 좌표를 스캔해 박스 드로잉 문자로 레이아웃 도식을 만들고, 아래에 컴포넌트 목록 표를 붙인다. 3-2 서두에 대표 1장 역할 설명 1문장을 자동 삽입한다.
+- 캔버스 **아래** `전달 사항(선택)` 여러 줄 입력란 — 대표 화면 배치에 대한 추가 설명·특이사항·다른 화면과의 차이. 비워 두면 Prompt.md에 생략한다. 입력 시 3-2 맨 아래 `**전달 사항 (작성자 메모)**` 블록으로 붙인다.
 
 ```
 ┌──────────────────────────────────────────┐
@@ -391,14 +400,18 @@ G11(Agent 범용성)·G12(배포 & 소스 보호)는 **VC Planner 자체 개발 
 
 | 버튼 | 동작 |
 |---|---|
-| `[📋 전체 프롬프트 복사]` | `Prompt.md` 전문을 클립보드로 (도구 비종속 표준 Markdown) |
-| `[📄 Agent 규칙 파일 복사]` | Step 3 규칙만 추려서 클립보드로. 대상 도구를 고르면 `.cursorrules` / `AGENTS.md` / `.windsurfrules` 등 파일명만 바뀌고 **내용은 동일** |
-| `[💾 txt/md 다운로드]` | UTF-8 Blob으로 파일 저장 |
-| `[🖨️ PDF 리포트 다운로드]` | 명세 + 와이어프레임 + 플로우차트 포함 A4 PDF |
+| `[💾 Prompt.md 다운로드]` | `Prompt.md` 전문을 UTF-8 파일로 저장 (도구 비종속 표준 Markdown) |
+| `[💾 Prompt.txt 다운로드]` | 위와 **동일 내용**, `.txt` 확장자로 저장 |
+| `[📄 Agent 규칙 파일 복사]` | Step 3 규칙만 클립보드로. 대상 도구를 고르면 `.cursorrules` / `AGENTS.md` / `.windsurfrules` 등 **저장 파일명** 안내만 바뀌고 **내용은 동일** |
+| `[💾 Agent 규칙 파일 다운로드]` | Step 3 규칙만 선택한 도구의 파일명으로 저장 (복사와 동일 내용) |
+
+**UI 배치 (Phase 6 확정)**: 맨 위 **Agent 규칙 대상 도구** 선택 → **Prompt** 줄(md·txt 다운로드) → **Rule** 줄(복사·규칙 파일 다운로드). Lovable / Bolt.new 등은 Rule 줄에 Prompt.md 다운로드 안내.
+
+**Prompt.md 전달**: 클립보드 복사 버튼은 두지 않는다 — md·txt **다운로드**와 내용이 같아 중복이므로. Lovable / Bolt.new 등 채팅 붙여넣기형 도구도 **다운로드한 Prompt.md**를 열어 복사하면 된다.
 
 **위임 항목 요약 배너**: `delegated === true`인 항목이 있으면 화면 상단에 "N개 항목을 Agent 판단에 맡겼습니다"를 표시하고, 클릭 시 해당 항목 목록을 펼친다.
 
-**PDF 주의사항**: `html2pdf.js`는 DOM을 이미지로 캡처하므로 한글 폰트 임베딩 문제가 없다. 다만 캔버스 기반 에디터는 화면 밖 영역이 잘릴 수 있으므로, **인쇄 전용 레이아웃 컴포넌트**를 별도로 만들어 캡처한다.
+**PDF (v1 범위 외)**: `[🖨️ PDF 리포트 다운로드]`는 **1차 배포 후 필요 시** 구현한다. 목표는 Step 1~3 설계 화면을 A4 PDF로 저장(우측 미리보기 제외). Tailwind v4 `oklab` ↔ `html2canvas` 호환 등 기술 검토 후 착수 [G8]. v1에는 UI·패키지를 포함하지 않는다.
 
 **다운로드 인코딩**: `Blob`에 `type: 'text/markdown;charset=utf-8'`을 지정하고 BOM은 붙이지 않는다. `.cursorrules`는 BOM이 파싱을 방해할 수 있어 반드시 BOM 없이 저장한다. 상세는 3-5장.
 
@@ -448,20 +461,22 @@ G11(Agent 범용성)·G12(배포 & 소스 보호)는 **VC Planner 자체 개발 
 - 레이아웃 → ASCII 도식 + 컴포넌트 목록표 변환기. 구 팔레트 LocalStorage → `content` 보정
 - **DoD**: 배치를 바꾸면 ASCII 도식이 형태를 따라 바뀐다 ✅ 확인 완료
 
-### Phase 6 — Step 4 출력
+### Phase 6 — Step 4 출력 ✅
 - 11장 표준 구조에 맞춘 `Prompt.md` 최종 조립, Agent 규칙 파일 추출 로직
 - 위임(`delegated`) 항목 → 위임 지시문 렌더링, 상단 요약 배너
 - 도구별 부록(`.cursorrules` / `AGENTS.md` / `.windsurfrules`) 파일명 매핑
-- 복사 / md·txt 다운로드 (UTF-8, BOM 없음)
-- **DoD**: ① 복사·다운로드한 파일을 Windows 메모장에서 열어도 한글이 깨지지 않는다 [G1] ② 생성물에 도구 전용 문법이 본문에 섞이지 않는다 [G11]
+- Agent 규칙 복사 / Prompt md·txt·규칙 파일 다운로드 (UTF-8, BOM 없음). Prompt.md는 다운로드만 제공
+- Step 4 UI: Agent 도구 선택 + Prompt / Rule 2줄 버튼 배치
+- **DoD**: ① 다운로드·복사한 파일을 Windows 메모장에서 열어도 한글이 깨지지 않는다 [G1] ② 생성물에 도구 전용 문법이 본문에 섞이지 않는다 [G11] — **확인 완료**
 
-### Phase 7 — PDF 리포트 & 마감
-- 인쇄 전용 레이아웃, `html2pdf.js` A4 출력 (플로우차트·와이어프레임 포함)
-- 빈 상태·에러 처리, 반응형 점검, 접근성(키보드 포커스·대비) 점검
-- README 작성 (라이선스 성격을 "source-available"로 정확히 표기, 12-3장)
-- **DoD**: PDF에 명세 전문과 두 다이어그램이 모두 잘리지 않고 담긴다
+### Phase 7 — 마감 & UX 보완 ✅ (PDF 제외)
+- `README.md` — source-available(BUSL-1.1) 성격 명시 (12-3장)
+- 데스크톱 **미리보기 서랍** — Prompt.md·Agent 규칙 패널 접기/펼치기, **기본 열림**, LocalStorage 상태 저장
+- **DoD**: Step 4 출력·실시간 미리보기·서랍 토글이 정상 동작한다 — **확인 완료**
 
-### Phase 8 — 배포 · 라이선스 · 소스 보호 [G12]
+**PDF (배포 후 선택 과제)**: Step 1~3 설계 화면 A4 PDF 저장. v1 배포 후 필요 시 착수 [G8]. `html2pdf.js`·Tailwind v4 `oklab` 호환 등 사전 검토 필요. **현재 서비스 UI·의존성에 미포함.**
+
+### Phase 8 — 배포 · 라이선스 · 소스 보호 [G12] ⏳ **다음**
 - `next.config.ts`에 Static Export 구성 적용 (`output: 'export'`, `images.unoptimized`, `productionBrowserSourceMaps: false`) — 12-1장
 - `npm run build` 결과 `out/` 정적 산출물 생성 확인, 로컬에서 정적 서버로 구동 검증
 - Cloudflare Pages 배포 설정 문서화 (빌드 명령 / 출력 디렉터리 / `_headers`) — 12-2장
@@ -476,7 +491,7 @@ G11(Agent 범용성)·G12(배포 & 소스 보호)는 **VC Planner 자체 개발 
 1. 마우스 클릭만으로 Step 1~4를 끝까지 완주할 수 있다.
 2. 모든 주요 선택 항목에 `[✏️ 직접 입력 / 기타]`가 있고, 그 내용이 출력물에 반영된다.
 3. 플로우차트와 와이어프레임이 각각 Mermaid / ASCII로 자동 변환된다.
-4. 4종 출력(복사·rules 복사·파일 다운로드·PDF)이 모두 동작한다.
+4. Step 4 출력(Agent 규칙 복사·Prompt/규칙 파일 다운로드)이 모두 동작한다. (PDF는 v1 범위 외 — 배포 후 선택)
 5. 새로고침 후에도 작업 내용이 유지된다.
 6. 한글이 어느 출력물에서도 깨지지 않는다.
 7. 외부 네트워크 요청이 0건이다(전 기능 브라우저 내 완결).
@@ -495,7 +510,7 @@ G11(Agent 범용성)·G12(배포 & 소스 보호)는 **VC Planner 자체 개발 
 | 라이브러리 peer dependency 충돌 | 설치 실패 | `--legacy-peer-deps`로 덮지 않고 원인 보고 후 승인 [G2][G8] |
 | 캔버스 라이브러리 SSR 오류 | 빌드·실행 실패 | `next/dynamic({ ssr: false })` + `'use client'` |
 | LocalStorage 하이드레이션 불일치 | 콘솔 경고·화면 깜빡임 | `mounted` 가드 공통 훅 |
-| PDF에서 캔버스 영역 잘림 | 리포트 품질 저하 | 인쇄 전용 레이아웃 별도 구성 후 캡처 |
+| PDF에서 캔버스·Tailwind v4 색상 잘림/파싱 오류 | 리포트 품질 저하 | v1 범위 외로 연기. 착수 시 인쇄 전용 레이아웃 + oklab→RGB 인라인 등 별도 설계 [G8] |
 | ASCII 변환 품질 | 레이아웃이 잘 안 읽힘 | 그리드 12열 기준 단순화. 복잡하면 컴포넌트 목록표를 주 수단으로 |
 | LocalStorage 용량(약 5MB) 초과 | 저장 실패 | 저장 실패를 감지해 안내하고 JSON 내보내기를 유도 |
 | 기능 욕심으로 인한 범위 확대 | 미완성 | Phase 경계 엄수 [G5], 10장 비범위 준수 |
@@ -554,8 +569,8 @@ Cursor / Claude Code / Windsurf / Lovable / Bolt.new 등에서 그대로 사용�
 - 서비스명 / 한 줄 설명 / 서비스 분야 / 대상 사용자 / 민감 데이터 여부
 
 ## 3. 요구사항 (Requirements)
-### 3-1. 업무 흐름   ← 텍스트 흐름 + Mermaid
-### 3-2. 화면 구성 (대표 1장)   ← ASCII 도식 + 컴포넌트 표
+### 3-1. 업무 흐름   ← 텍스트 흐름 + Mermaid + (선택) 전달 사항
+### 3-2. 화면 구성 (대표 1장)   ← ASCII 도식 + 컴포넌트 표 + (선택) 전달 사항
 ### 3-3. 입출력 데이터
 ### 3-4. 예외 상황 처리
 
@@ -767,7 +782,9 @@ VC Planner 자체의 소스코드는 BUSL-1.1로 보호되며 무단 재배포·
 2. ~~12-3장 라이선스를 **BUSL-1.1**로 확정~~ ✅ 완료 — 단, `LICENSE` 작성에 필요한 **Licensor 표기명**과 **Change Date**는 미정
 3. ~~Phase 0 착수. 12-1장 `next.config.ts` 설정을 함께 적용한다.~~ ✅ 완료
 4. ~~Phase 0 완료 시점에 1-2장 가드레일(G1~G12)을 `.cursorrules` + `AGENTS.md`로 생성한다.~~ ✅ 완료
-5. Phase 0 승인 후 Phase 1(공통 입력 컴포넌트)로 넘어간다.
+5. ~~Phase 0 승인 후 Phase 1(공통 입력 컴포넌트)로 넘어간다.~~ ✅ Phase 0~7 완료 (PDF 제외)
+6. **Phase 8 착수** — `LICENSE`·`NOTICE`, 푸터 라이선스 고지, Cloudflare Pages 배포 문서, `out/` 배포 DoD
+7. **(배포 후 선택)** PDF 리포트 — Step 1~3 설계 화면 A4 저장, 기술 검토 후 [G8] 승인
 
 ### Phase 0 결과 메모
 

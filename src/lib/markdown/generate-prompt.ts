@@ -15,6 +15,8 @@ import { renderFlowchartMarkdown } from "@/lib/flowchart/serialize";
 import { renderWireframeMarkdown } from "@/lib/wireframe/serialize";
 import { renderDelegationSection } from "./render-delegation";
 import { renderAgentRulesBody, renderGuardrailsSection } from "./render-guardrails";
+import { renderSuggestedPlanSection, renderDefinitionOfDoneSection } from "./render-plan";
+import { renderToolAppendix } from "./render-appendix";
 import {
   renderChoiceListMarkdown,
   renderChoiceMarkdown,
@@ -38,9 +40,9 @@ function renderRoleSection(state: ProjectState): string {
   ].join("\n");
 }
 
-/** Phase 3: Step 1~3 항목 + 4·5·6장 연결 */
+/** Phase 6: Plan 11-2 표준 0~8장 + 선택 부록 */
 export function generatePromptMarkdown(state: ProjectState): string {
-  const { basic, dataIO, edgeCases, tech, flowchart, wireframe } = state;
+  const { basic, dataIO, edgeCases, tech, flowchart, wireframe, output } = state;
   const title = basic.serviceName.trim() || DEFAULT_TITLE;
   const oneLiner = basic.oneLiner.trim() || "_(미입력)_";
 
@@ -72,11 +74,19 @@ export function generatePromptMarkdown(state: ProjectState): string {
     "",
     "### 3-1. 업무 흐름",
     "",
-    renderFlowchartMarkdown(flowchart.nodes, flowchart.edges),
+    renderFlowchartMarkdown(
+      flowchart.nodes,
+      flowchart.edges,
+      flowchart.deliveryNotes,
+    ),
     "",
     "### 3-2. 화면 구성 (대표 1장)",
     "",
-    renderWireframeMarkdown(wireframe.items, wireframe.cols),
+    renderWireframeMarkdown(
+      wireframe.items,
+      wireframe.cols,
+      wireframe.deliveryNotes,
+    ),
     "",
     "### 3-3. 입출력 데이터",
     "",
@@ -107,6 +117,20 @@ export function generatePromptMarkdown(state: ProjectState): string {
 
   if (delegationSection) {
     sections.push(delegationSection, "");
+  }
+
+  sections.push(
+    renderSuggestedPlanSection(flowchart.nodes, flowchart.edges),
+    "",
+    renderDefinitionOfDoneSection(state),
+    "",
+  );
+
+  const appendix = output.includeToolAppendix
+    ? renderToolAppendix(output.targetAgents)
+    : null;
+  if (appendix) {
+    sections.push(appendix, "");
   }
 
   sections.push(

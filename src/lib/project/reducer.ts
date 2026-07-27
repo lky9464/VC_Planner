@@ -25,8 +25,10 @@ export type ProjectAction =
     }
   | { type: "APPLY_STEP2_DEFAULTS" }
   | { type: "SET_FLOWCHART"; nodes: FlowNode[]; edges: FlowEdge[] }
+  | { type: "SET_FLOWCHART_DELIVERY_NOTES"; notes: string }
   | { type: "APPLY_CRUD_FLOW_PRESET" }
   | { type: "SET_WIREFRAME"; items: WireframeItem[] }
+  | { type: "SET_WIREFRAME_DELIVERY_NOTES"; notes: string }
   | { type: "APPLY_DASHBOARD_WIREFRAME_PRESET" };
 
 const G10_ID = "g10";
@@ -79,11 +81,16 @@ function normalizeHydratedState(raw: unknown): ProjectState {
       updatedAt: data.meta?.updatedAt ?? new Date().toISOString(),
     },
     basic: { ...initial.basic, ...data.basic },
-    flowchart: { ...initial.flowchart, ...data.flowchart },
+    flowchart: {
+      ...initial.flowchart,
+      ...data.flowchart,
+      deliveryNotes: data.flowchart?.deliveryNotes ?? "",
+    },
     wireframe: {
       ...initial.wireframe,
       ...data.wireframe,
       items: normalizeWireframeItems(data.wireframe?.items),
+      deliveryNotes: data.wireframe?.deliveryNotes ?? "",
     },
     dataIO: { ...initial.dataIO, ...data.dataIO },
     edgeCases: { ...initial.edgeCases, ...data.edgeCases },
@@ -158,21 +165,44 @@ export function projectReducer(
       return {
         ...state,
         meta: { ...state.meta, updatedAt: new Date().toISOString() },
-        flowchart: { nodes: action.nodes, edges: action.edges },
+        flowchart: {
+          ...state.flowchart,
+          nodes: action.nodes,
+          edges: action.edges,
+        },
       };
 
-    case "APPLY_CRUD_FLOW_PRESET":
+    case "SET_FLOWCHART_DELIVERY_NOTES":
       return {
         ...state,
         meta: { ...state.meta, updatedAt: new Date().toISOString() },
-        flowchart: createCrudFlowPreset(),
+        flowchart: { ...state.flowchart, deliveryNotes: action.notes },
       };
+
+    case "APPLY_CRUD_FLOW_PRESET": {
+      const preset = createCrudFlowPreset();
+      return {
+        ...state,
+        meta: { ...state.meta, updatedAt: new Date().toISOString() },
+        flowchart: {
+          ...preset,
+          deliveryNotes: state.flowchart.deliveryNotes,
+        },
+      };
+    }
 
     case "SET_WIREFRAME":
       return {
         ...state,
         meta: { ...state.meta, updatedAt: new Date().toISOString() },
         wireframe: { ...state.wireframe, items: action.items },
+      };
+
+    case "SET_WIREFRAME_DELIVERY_NOTES":
+      return {
+        ...state,
+        meta: { ...state.meta, updatedAt: new Date().toISOString() },
+        wireframe: { ...state.wireframe, deliveryNotes: action.notes },
       };
 
     case "APPLY_DASHBOARD_WIREFRAME_PRESET":

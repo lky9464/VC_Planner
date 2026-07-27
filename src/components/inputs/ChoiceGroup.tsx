@@ -27,6 +27,8 @@ type Props = {
   customInputLabel?: string;
   /** 체크 해제 불가 옵션 id (민감 데이터 → G10 잠금 등) */
   lockedIds?: string[];
+  /** PDF 캡처 — 화면과 동일하게 보이되 조작 UI는 숨김 */
+  readOnly?: boolean;
 };
 
 /**
@@ -44,6 +46,7 @@ export function ChoiceGroup({
   allowCustom = true,
   customInputLabel = "✏️ 직접 입력 / 기타",
   lockedIds = [],
+  readOnly = false,
 }: Props) {
   const groupId = useId();
   const multiple = mode === "checkbox";
@@ -81,13 +84,14 @@ export function ChoiceGroup({
         </div>
       )}
 
-      <div className={isDisabled ? "pointer-events-none opacity-45" : undefined}>
+      <div className={isDisabled && !readOnly ? "pointer-events-none opacity-45" : readOnly ? "pointer-events-none" : undefined}>
         {mode === "dropdown" ? (
           <DropdownSelect
             groupId={groupId}
             options={options}
             value={value}
             onSelect={handleSelect}
+            readOnly={readOnly}
           />
         ) : (
           <OptionList
@@ -97,11 +101,12 @@ export function ChoiceGroup({
             value={value}
             lockedIds={lockedIds}
             onSelect={handleSelect}
+            readOnly={readOnly}
           />
         )}
       </div>
 
-      {allowCustom && (
+      {allowCustom && !readOnly && (
         <CustomInputSection
           groupId={groupId}
           value={value}
@@ -112,7 +117,11 @@ export function ChoiceGroup({
         />
       )}
 
-      {allowDelegate && (
+      {readOnly && allowCustom && value.customEnabled && (
+        <ReadOnlyCustomText groupId={groupId} value={value} toggleLabel={customInputLabel} />
+      )}
+
+      {allowDelegate && !readOnly && (
         <DelegateSection
           groupId={groupId}
           value={value}
@@ -124,6 +133,33 @@ export function ChoiceGroup({
   );
 }
 
+function ReadOnlyCustomText({
+  groupId,
+  value,
+  toggleLabel,
+}: {
+  groupId: string;
+  value: ChoiceValue;
+  toggleLabel: string;
+}) {
+  const inputId = `${groupId}-custom-text-readonly`;
+
+  return (
+    <div className="space-y-2 border-t border-line pt-3">
+      <label htmlFor={inputId} className="text-sm text-fg">
+        {toggleLabel}
+      </label>
+      <textarea
+        id={inputId}
+        value={value.customText}
+        readOnly
+        rows={3}
+        className="w-full resize-y rounded-lg border border-line bg-surface px-3 py-2 text-sm text-fg read-only:cursor-default read-only:opacity-100"
+      />
+    </div>
+  );
+}
+
 function OptionList({
   groupId,
   mode,
@@ -131,6 +167,7 @@ function OptionList({
   value,
   lockedIds,
   onSelect,
+  readOnly = false,
 }: {
   groupId: string;
   mode: "radio" | "checkbox";
@@ -138,6 +175,7 @@ function OptionList({
   value: ChoiceValue;
   lockedIds: string[];
   onSelect: (id: string) => void;
+  readOnly?: boolean;
 }) {
   return (
     <ul className="space-y-2" role={mode === "checkbox" ? "group" : "radiogroup"}>
@@ -150,7 +188,9 @@ function OptionList({
           <li key={option.id}>
             <label
               htmlFor={inputId}
-              className={`flex cursor-pointer items-start gap-3 rounded-lg border px-3 py-2.5 transition-colors ${
+              className={`flex items-start gap-3 rounded-lg border px-3 py-2.5 transition-colors ${
+                readOnly ? "cursor-default" : "cursor-pointer"
+              } ${
                 checked
                   ? "border-accent/50 bg-accent-soft/60"
                   : "border-line hover:border-accent/30 hover:bg-surface-2"
@@ -161,6 +201,7 @@ function OptionList({
                 type={mode}
                 name={mode === "radio" ? groupId : undefined}
                 checked={checked}
+                readOnly={readOnly}
                 onChange={() => onSelect(option.id)}
                 className="mt-0.5 size-4 shrink-0 accent-[var(--accent)]"
               />
@@ -193,11 +234,13 @@ function DropdownSelect({
   options,
   value,
   onSelect,
+  readOnly = false,
 }: {
   groupId: string;
   options: Option[];
   value: ChoiceValue;
   onSelect: (id: string) => void;
+  readOnly?: boolean;
 }) {
   const selected = value.selectedIds[0] ?? "";
 
@@ -206,8 +249,9 @@ function DropdownSelect({
       <select
         id={`${groupId}-select`}
         value={selected}
+        disabled={readOnly}
         onChange={(e) => onSelect(e.target.value)}
-        className="w-full rounded-lg border border-line bg-surface px-3 py-2.5 text-sm text-fg focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30"
+        className="w-full rounded-lg border border-line bg-surface px-3 py-2.5 text-sm text-fg focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30 disabled:cursor-default disabled:opacity-100"
       >
         <option value="">— 선택해 주세요 —</option>
         {options.map((option) => (

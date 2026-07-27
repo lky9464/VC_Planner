@@ -11,6 +11,7 @@ type Props = {
   onSelect: (id: string) => void;
   onLabelChange: (id: string, label: string) => void;
   onRemove: (id: string) => void;
+  readOnly?: boolean;
 };
 
 /** 그리드 안 한 블록 — 더블클릭으로 명칭 편집 */
@@ -20,6 +21,7 @@ export function WireframeBlock({
   onSelect,
   onLabelChange,
   onRemove,
+  readOnly = false,
 }: Props) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(item.label);
@@ -42,6 +44,19 @@ export function WireframeBlock({
   }, [draft, item.i, item.label, onLabelChange]);
 
   const typeLabel = WIREFRAME_TYPE_LABELS[item.type];
+
+  if (readOnly) {
+    return (
+      <div className="wireframe-block relative flex h-full flex-col overflow-hidden rounded-md border border-line bg-surface-2/90 p-2 text-left">
+        <span className="truncate text-[10px] font-semibold uppercase tracking-wide text-accent">
+          {typeLabel}
+        </span>
+        <p className="mt-1 line-clamp-3 flex-1 text-xs leading-snug text-fg">
+          {item.label}
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div

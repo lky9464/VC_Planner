@@ -17,15 +17,20 @@ import {
   createWireframeItem,
 } from "@/lib/wireframe/constants";
 import { WireframeBlock } from "./WireframeBlock";
+import { DeliveryNotesField } from "@/components/inputs/DeliveryNotesField";
 
 type Props = {
   items: WireframeItem[];
   cols?: number;
   rowHeight?: number;
+  deliveryNotes: string;
   /** 업무 흐름도의 기능·페이지 노드 수 — 안내 문구용 */
   flowchartPageCount?: number;
   onChange: (items: WireframeItem[]) => void;
+  onDeliveryNotesChange: (notes: string) => void;
   onApplyDashboardPreset: () => void;
+  /** PDF 캡처 — 그리드만 표시 */
+  readOnly?: boolean;
 };
 
 function toLayout(items: WireframeItem[]): Layout {
@@ -54,9 +59,12 @@ export function WireframeEditor({
   items,
   cols = WIREFRAME_COLS,
   rowHeight = WIREFRAME_ROW_HEIGHT,
+  deliveryNotes,
   flowchartPageCount = 0,
   onChange,
+  onDeliveryNotesChange,
   onApplyDashboardPreset,
+  readOnly = false,
 }: Props) {
   const { width, containerRef, mounted } = useContainerWidth();
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -107,8 +115,9 @@ export function WireframeEditor({
 
   const handleClear = useCallback(() => {
     onChange([]);
+    onDeliveryNotesChange("");
     setSelectedId(null);
-  }, [onChange]);
+  }, [onChange, onDeliveryNotesChange]);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -129,6 +138,62 @@ export function WireframeEditor({
     const rows = Math.max(...items.map((i) => i.y + i.h), 4);
     return Math.max(320, rows * rowHeight + 48);
   }, [items, rowHeight]);
+
+  if (readOnly) {
+    return (
+      <div className="space-y-3">
+        <div
+          ref={containerRef}
+          className="wireframe-canvas relative w-full overflow-hidden rounded-lg border border-line bg-bg"
+          style={{ minHeight }}
+        >
+          {mounted && width > 0 && (
+            <ReactGridLayout
+              width={width}
+              layout={layout}
+              gridConfig={{
+                cols,
+                rowHeight,
+                margin: [8, 8] as [number, number],
+                containerPadding: [8, 8] as [number, number],
+              }}
+              dragConfig={{ enabled: false, bounded: false }}
+              resizeConfig={{ enabled: false }}
+              compactor={verticalCompactor}
+            >
+              {items.map((item) => (
+                <div key={item.i}>
+                  <WireframeBlock
+                    item={item}
+                    selected={false}
+                    onSelect={() => {}}
+                    onLabelChange={() => {}}
+                    onRemove={() => {}}
+                    readOnly
+                  />
+                </div>
+              ))}
+            </ReactGridLayout>
+          )}
+
+          {items.length === 0 && (
+            <div className="pointer-events-none absolute inset-0 flex items-center justify-center px-6 text-center text-xs text-muted">
+              (와이어프레임이 비어 있습니다)
+            </div>
+          )}
+        </div>
+
+        <DeliveryNotesField
+          inputId="wireframe-delivery-notes-print"
+          value={deliveryNotes}
+          onChange={onDeliveryNotesChange}
+          readOnly
+          description="대표 화면 배치에 대한 추가 설명·특이사항·다른 화면과의 차이 등을 적어 주세요. 비워 두어도 됩니다."
+          placeholder="예) 네비게이션바와 사이드바는 모든 화면에서 공통(고정), 화면별 컨텐츠는 기능페이지별 다른 형태 등"
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-3">
@@ -260,6 +325,14 @@ export function WireframeEditor({
           </div>
         )}
       </div>
+
+      <DeliveryNotesField
+        inputId="wireframe-delivery-notes"
+        value={deliveryNotes}
+        onChange={onDeliveryNotesChange}
+        description="대표 화면 배치에 대한 추가 설명·특이사항·다른 화면과의 차이 등을 적어 주세요. 비워 두어도 됩니다."
+        placeholder="예) 네비게이션바와 사이드바는 모든 화면에서 공통(고정), 화면별 컨텐츠는 기능페이지별 다른 형태 등"
+      />
     </div>
   );
 }

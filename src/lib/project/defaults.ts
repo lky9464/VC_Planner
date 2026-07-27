@@ -95,8 +95,8 @@ export function createInitialState(): ProjectState {
       domain: createInitialChoiceValue(DOMAIN_OPTIONS),
       sensitiveData: createInitialChoiceValue(SENSITIVE_DATA_OPTIONS),
     },
-    flowchart: { nodes: [], edges: [] },
-    wireframe: { items: [], cols: 12, rowHeight: 30 },
+    flowchart: { nodes: [], edges: [], deliveryNotes: "" },
+    wireframe: { items: [], cols: 12, rowHeight: 30, deliveryNotes: "" },
     dataIO: {
       input: createInitialChoiceValue(INPUT_OPTIONS),
       output: createInitialChoiceValue(OUTPUT_TYPE_OPTIONS),

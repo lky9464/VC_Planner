@@ -49,8 +49,13 @@ export type ProjectState = {
     domain: ChoiceValue;
     sensitiveData: ChoiceValue;
   };
-  flowchart: { nodes: FlowNode[]; edges: FlowEdge[] };
-  wireframe: { items: WireframeItem[]; cols: number; rowHeight: number };
+  flowchart: { nodes: FlowNode[]; edges: FlowEdge[]; deliveryNotes: string };
+  wireframe: {
+    items: WireframeItem[];
+    cols: number;
+    rowHeight: number;
+    deliveryNotes: string;
+  };
   dataIO: { input: ChoiceValue; output: ChoiceValue };
   edgeCases: { emptyState: ChoiceValue; errorState: ChoiceValue };
 

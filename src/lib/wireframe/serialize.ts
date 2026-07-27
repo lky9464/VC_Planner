@@ -138,9 +138,20 @@ export function buildComponentTable(items: WireframeItem[]): string {
 export function renderWireframeMarkdown(
   items: WireframeItem[],
   cols: number,
+  deliveryNotes = "",
 ): string {
-  if (items.length === 0) {
+  if (items.length === 0 && !deliveryNotes.trim()) {
     return "_(아직 배치한 대표 화면 레이아웃이 없습니다)_";
+  }
+
+  if (items.length === 0) {
+    return [
+      "_(아직 배치한 대표 화면 레이아웃이 없습니다)_",
+      "",
+      "**전달 사항 (작성자 메모)**:",
+      "",
+      deliveryNotes.trim(),
+    ].join("\n");
   }
 
   const intro =
@@ -149,7 +160,7 @@ export function renderWireframeMarkdown(
   const ascii = buildAsciiDiagram(items, cols);
   const table = buildComponentTable(items);
 
-  return [
+  const lines = [
     intro,
     "",
     "**ASCII 레이아웃 도식**:",
@@ -161,5 +172,12 @@ export function renderWireframeMarkdown(
     "**컴포넌트 목록**:",
     "",
     table,
-  ].join("\n");
+  ];
+
+  const notes = deliveryNotes.trim();
+  if (notes) {
+    lines.push("", "**전달 사항 (작성자 메모)**:", "", notes);
+  }
+
+  return lines.join("\n");
 }

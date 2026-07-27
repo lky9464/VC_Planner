@@ -5,6 +5,7 @@ import { ChoiceGroup } from "@/components/inputs/ChoiceGroup";
 import { TextField } from "@/components/inputs/TextField";
 import { FlowchartEditor } from "@/components/flowchart/FlowchartEditor";
 import { WireframeEditor } from "@/components/wireframe/WireframeEditor";
+import { ExportPanel } from "@/components/export/ExportPanel";
 import { FinishSuccessAlert } from "@/components/layout/FinishSuccessAlert";
 import { useProject } from "@/context/ProjectContext";
 import { isSensitiveDataIncluded } from "@/lib/project/reducer";
@@ -26,9 +27,11 @@ import type { StepId } from "@/lib/steps";
 export function StepBody({
   step,
   finishSuccess = false,
+  readOnly = false,
 }: {
   step: StepId;
   finishSuccess?: boolean;
+  readOnly?: boolean;
 }) {
   const { hydrated } = useProject();
 
@@ -42,24 +45,26 @@ export function StepBody({
 
   return (
     <div className="space-y-6">
-      {step === 1 && <Step1Fields />}
-      {step === 2 && <Step2Fields />}
-      {step === 3 && <Step3Fields />}
+      {step === 1 && <Step1Fields readOnly={readOnly} />}
+      {step === 2 && <Step2Fields readOnly={readOnly} />}
+      {step === 3 && <Step3Fields readOnly={readOnly} />}
       {step === 4 && <Step4Fields finishSuccess={finishSuccess} />}
 
-      <ComingSoonNotice step={step} />
+      {!readOnly && <ComingSoonNotice step={step} />}
     </div>
   );
 }
 
-function Step1Fields() {
+function Step1Fields({ readOnly = false }: { readOnly?: boolean }) {
   const {
     state,
     setChoice,
     setBasicText,
     setFlowchart,
+    setFlowchartDeliveryNotes,
     applyCrudFlowPreset,
     setWireframe,
+    setWireframeDeliveryNotes,
     applyDashboardWireframePreset,
   } = useProject();
 
@@ -75,6 +80,7 @@ function Step1Fields() {
           value={state.basic.serviceName}
           onChange={(v) => setBasicText("serviceName", v)}
           placeholder="예: 재고 관리 도우미"
+          readOnly={readOnly}
         />
         <TextField
           label="한 줄 설명"
@@ -83,6 +89,7 @@ function Step1Fields() {
           onChange={(v) => setBasicText("oneLiner", v)}
           placeholder="예: 창고 재고를 쉽게 등록·조회하는 웹앱"
           multiline
+          readOnly={readOnly}
         />
         <ChoiceField
           path="basic.domain"
@@ -92,6 +99,7 @@ function Step1Fields() {
           options={DOMAIN_OPTIONS}
           value={state.basic.domain}
           onChange={setChoice}
+          readOnly={readOnly}
         />
         <ChoiceField
           path="basic.sensitiveData"
@@ -101,6 +109,7 @@ function Step1Fields() {
           options={SENSITIVE_DATA_OPTIONS}
           value={state.basic.sensitiveData}
           onChange={setChoice}
+          readOnly={readOnly}
         />
       </section>
 
@@ -111,8 +120,11 @@ function Step1Fields() {
         <FlowchartEditor
           nodes={state.flowchart.nodes}
           edges={state.flowchart.edges}
+          deliveryNotes={state.flowchart.deliveryNotes}
           onChange={setFlowchart}
+          onDeliveryNotesChange={setFlowchartDeliveryNotes}
           onApplyCrudPreset={applyCrudFlowPreset}
+          readOnly={readOnly}
         />
       </section>
 
@@ -124,11 +136,14 @@ function Step1Fields() {
           items={state.wireframe.items}
           cols={state.wireframe.cols}
           rowHeight={state.wireframe.rowHeight}
+          deliveryNotes={state.wireframe.deliveryNotes}
           flowchartPageCount={
             state.flowchart.nodes.filter((node) => node.type === "page").length
           }
           onChange={setWireframe}
+          onDeliveryNotesChange={setWireframeDeliveryNotes}
           onApplyDashboardPreset={applyDashboardWireframePreset}
+          readOnly={readOnly}
         />
       </section>
 
@@ -144,6 +159,7 @@ function Step1Fields() {
           options={INPUT_OPTIONS}
           value={state.dataIO.input}
           onChange={setChoice}
+          readOnly={readOnly}
         />
         <ChoiceField
           path="dataIO.output"
@@ -153,6 +169,7 @@ function Step1Fields() {
           options={OUTPUT_TYPE_OPTIONS}
           value={state.dataIO.output}
           onChange={setChoice}
+          readOnly={readOnly}
         />
       </section>
 
@@ -167,6 +184,7 @@ function Step1Fields() {
           options={EMPTY_STATE_OPTIONS}
           value={state.edgeCases.emptyState}
           onChange={setChoice}
+          readOnly={readOnly}
         />
         <ChoiceField
           path="edgeCases.errorState"
@@ -175,30 +193,33 @@ function Step1Fields() {
           options={ERROR_STATE_OPTIONS}
           value={state.edgeCases.errorState}
           onChange={setChoice}
+          readOnly={readOnly}
         />
       </section>
     </>
   );
 }
 
-function Step2Fields() {
+function Step2Fields({ readOnly = false }: { readOnly?: boolean }) {
   const { state, setChoice, applyStep2Defaults } = useProject();
 
   return (
     <>
-      <button
-        type="button"
-        onClick={applyStep2Defaults}
-        className="flex w-full items-center gap-2 rounded-lg border border-accent/35 bg-accent-soft/40 px-4 py-3 text-left text-sm text-fg transition-colors hover:border-accent/50 hover:bg-accent-soft/70"
-      >
-        <Sparkles className="size-4 shrink-0 text-accent" aria-hidden />
-        <span>
-          <strong>✨ 잘 모르겠어요 (기본값 적용)</strong>
-          <span className="mt-0.5 block text-xs text-muted">
-            Next.js 웹앱 + 브라우저 저장(LocalStorage) 추천값으로 채웁니다
+      {!readOnly && (
+        <button
+          type="button"
+          onClick={applyStep2Defaults}
+          className="flex w-full items-center gap-2 rounded-lg border border-accent/35 bg-accent-soft/40 px-4 py-3 text-left text-sm text-fg transition-colors hover:border-accent/50 hover:bg-accent-soft/70"
+        >
+          <Sparkles className="size-4 shrink-0 text-accent" aria-hidden />
+          <span>
+            <strong>✨ 잘 모르겠어요 (기본값 적용)</strong>
+            <span className="mt-0.5 block text-xs text-muted">
+              Next.js 웹앱 + 브라우저 저장(LocalStorage) 추천값으로 채웁니다
+            </span>
           </span>
-        </span>
-      </button>
+        </button>
+      )}
 
       <ChoiceField
         path="tech.appType"
@@ -208,6 +229,7 @@ function Step2Fields() {
         value={state.tech.appType}
         onChange={setChoice}
         allowDelegate
+        readOnly={readOnly}
       />
       <ChoiceField
         path="tech.storage"
@@ -217,12 +239,13 @@ function Step2Fields() {
         value={state.tech.storage}
         onChange={setChoice}
         allowDelegate
+        readOnly={readOnly}
       />
     </>
   );
 }
 
-function Step3Fields() {
+function Step3Fields({ readOnly = false }: { readOnly?: boolean }) {
   const { state, setChoice } = useProject();
   const g10Locked = isSensitiveDataIncluded(state);
 
@@ -236,6 +259,7 @@ function Step3Fields() {
         options={ROLE_OPTIONS}
         value={state.agentRules.role}
         onChange={setChoice}
+        readOnly={readOnly}
       />
       <ChoiceField
         path="agentRules.guardrails"
@@ -251,6 +275,7 @@ function Step3Fields() {
         onChange={setChoice}
         lockedIds={g10Locked ? ["g10"] : []}
         customInputLabel="➕ 가드레일 직접 추가"
+        readOnly={readOnly}
       />
     </>
   );
@@ -260,12 +285,7 @@ function Step4Fields({ finishSuccess }: { finishSuccess: boolean }) {
   return (
     <div className="space-y-4">
       {finishSuccess && <FinishSuccessAlert />}
-
-      <p className="text-sm text-muted">
-        모든 Step 입력이 완료되면 하단 <strong className="text-fg">명세서 받기</strong>{" "}
-        버튼으로 결과물을 받을 수 있습니다. 오른쪽 미리보기에서 Prompt.md를
-        실시간으로 확인하세요.
-      </p>
+      <ExportPanel />
     </div>
   );
 }
@@ -275,6 +295,7 @@ function ChoiceField({
   allowDelegate = false,
   lockedIds,
   customInputLabel,
+  readOnly = false,
   ...props
 }: {
   path: ChoiceFieldPath;
@@ -287,6 +308,7 @@ function ChoiceField({
   allowDelegate?: boolean;
   lockedIds?: string[];
   customInputLabel?: string;
+  readOnly?: boolean;
 }) {
   return (
     <ChoiceGroup
@@ -294,15 +316,14 @@ function ChoiceField({
       allowDelegate={allowDelegate}
       lockedIds={lockedIds}
       customInputLabel={customInputLabel}
+      readOnly={readOnly}
       onChange={(value) => props.onChange(path, value)}
     />
   );
 }
 
 function ComingSoonNotice({ step }: { step: StepId }) {
-  const LATER: Partial<Record<StepId, string[]>> = {
-    4: ["프롬프트 복사 · 다운로드 · PDF (Phase 6)"],
-  };
+  const LATER: Partial<Record<StepId, string[]>> = {};
 
   const items = LATER[step];
   if (!items?.length) return null;
