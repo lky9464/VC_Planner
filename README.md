@@ -114,37 +114,6 @@ AI가 코드를 작성할 때 지켜야 할 **역할**과 **가드레일**(UTF-8
 
 ---
 
-## 개발자용 — 로컬 실행
-
-| 항목 | 버전 |
-|------|------|
-| Node.js | ≥ 20 |
-| Next.js | 15 (Static Export) |
-| React | 19 |
-
-```powershell
-git clone https://github.com/lky9464/VC_Planner.git
-cd VC_Planner
-npm install
-npm run dev
-```
-
-브라우저에서 [http://localhost:3000](http://localhost:3000) 을 엽니다.
-
-```powershell
-npm run build   # 정적 산출물 → out/
-```
-
-| 문서 | 설명 |
-|------|------|
-| [`Plan.md`](Plan.md) | 개발 명세 (Single Source of Truth) |
-| [`docs/DEPLOY.md`](docs/DEPLOY.md) | Cloudflare Pages 배포 가이드 |
-| [`docs/HANDOFF.md`](docs/HANDOFF.md) | 세션 인수인계 |
-
-README 스크린샷 재생성: `node scripts/capture-readme-screenshots.mjs` (Playwright 필요, `npm install --no-save playwright` 후 실행)
-
----
-
 ## 라이선스
 
 | 대상 | 라이선스 |

@@ -1,5 +1,7 @@
 "use client";
 
+import { BookOpen } from "lucide-react";
+import { README_URL } from "@/lib/project/constants";
 import { StepProgress } from "./StepProgress";
 import { SaveIndicator, type SaveStatus } from "./SaveIndicator";
 import type { StepId } from "@/lib/steps";
@@ -35,8 +37,20 @@ export function Header({ current, completedSteps, onSelect, saveStatus }: Props)
           />
         </div>
 
-        <div className="hidden shrink-0 sm:block">
-          <SaveIndicator status={saveStatus} />
+        <div className="flex shrink-0 items-center gap-2.5">
+          <a
+            href={README_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-accent/40 bg-accent-soft px-2.5 py-1.5 text-xs font-semibold text-accent shadow-sm shadow-accent/10 transition-colors hover:border-accent/70 hover:bg-accent/20 hover:text-fg"
+            title="GitHub README에서 사용 방법 보기"
+          >
+            <BookOpen className="size-3.5 shrink-0" aria-hidden />
+            사용 방법
+          </a>
+          <div className="hidden sm:block">
+            <SaveIndicator status={saveStatus} />
+          </div>
         </div>
       </div>
     </header>
