@@ -2,13 +2,14 @@
 
 > **서비스명**: VC Planner
 > **한 줄 설명**: 비개발자가 단계별 질문·플로우차트·와이어프레임으로 서비스를 설계하고, 어떤 AI Coding Agent에도 붙여넣을 수 있는 표준 Markdown 개발 명세서(`Prompt.md` + Agent 규칙 파일)를 생성하는 웹 서비스
-> **문서 버전**: v1.4
+> **문서 버전**: v1.5
 > **변경 이력**:
 > - v1.0 — 초안
 > - v1.1 — ① `[✨ AI 추천]` 버튼 의미 확정(다운스트림 Agent 위임) ② Agent 범용성(도구 비종속 표준 Markdown) 요구사항 추가 ③ Cloudflare Pages 배포·라이선스·소스 보호 가드레일 추가 ④ 개발 환경 버전 정보 확정 기록
 > - v1.2 — ① 와이어프레임 팔레트 8종→5종(`content` 추가, table/kpi/buttons/chart 제거) ② 기본 불러오기를 공통 화면 틀 프리셋으로 변경 ③ 대표 화면 1장·업무 흐름도 작성 요령 UI ④ Prompt.md 3-1·3-2 서두 문구
 > - v1.3 — ① 업무 흐름도·와이어프레임 캔버스 아래 `전달 사항(선택)` 입력란 ② Prompt.md 3-1·3-2에 작성자 메모 반영 ③ Step 4에서 `[📋 전체 프롬프트 복사]` 제거(Prompt.md·txt 다운로드와 중복)
 > - v1.4 — ① Phase 6 완료(Step 4 출력·DoD 확인) ② Phase 7 마감(README·미리보기 서랍) ③ **PDF 리포트는 v1 배포 후 선택 과제로 연기**(UI·`html2pdf.js` 미포함) ④ Step 4 UI: Agent 도구 선택 → Prompt / Rule 2줄 배치
+> - v1.5 — ① Phase 8 완료(LICENSE·NOTICE·`_headers`·배포 문서) ② Licensor `lky9464`, Change Date `2030-07-27` 확정
 
 ---
 
@@ -476,13 +477,13 @@ G11(Agent 범용성)·G12(배포 & 소스 보호)는 **VC Planner 자체 개발 
 
 **PDF (배포 후 선택 과제)**: Step 1~3 설계 화면 A4 PDF 저장. v1 배포 후 필요 시 착수 [G8]. `html2pdf.js`·Tailwind v4 `oklab` 호환 등 사전 검토 필요. **현재 서비스 UI·의존성에 미포함.**
 
-### Phase 8 — 배포 · 라이선스 · 소스 보호 [G12] ⏳ **다음**
-- `next.config.ts`에 Static Export 구성 적용 (`output: 'export'`, `images.unoptimized`, `productionBrowserSourceMaps: false`) — 12-1장
-- `npm run build` 결과 `out/` 정적 산출물 생성 확인, 로컬에서 정적 서버로 구동 검증
-- Cloudflare Pages 배포 설정 문서화 (빌드 명령 / 출력 디렉터리 / `_headers`) — 12-2장
-- `LICENSE`(BUSL-1.1) + `NOTICE` 추가, 푸터 라이선스 고지 컴포넌트, 생성물 하단 출처 문구 — 12-3장
-- 프로덕션 번들에서 소스맵·주석 제거 확인 — 12-4장
-- **DoD**: ① `out/`을 그대로 올려 동작한다 ② 배포본 DevTools에 원본 소스맵이 노출되지 않는다 ③ 푸터에 라이선스 고지가 보인다
+### Phase 8 — 배포 · 라이선스 · 소스 보호 [G12] ✅
+- `next.config.ts`에 Static Export 구성 적용 (`output: 'export'`, `images.unoptimized`, `productionBrowserSourceMaps: false`) — 12-1장 — **Phase 0부터 적용 완료**
+- `npm run build` 결과 `out/` 정적 산출물 생성 확인 — **확인 완료**
+- `public/_headers` 보안 헤더 + `docs/DEPLOY.md` Cloudflare Pages 배포 문서 — 12-2장
+- `LICENSE`(BUSL-1.1, Licensor: lky9464, Change Date: 2030-07-27) + `NOTICE`, 푸터·Prompt.md 하단 출처 — 12-3장
+- 프로덕션 번들 소스맵 미생성 확인 — 12-4장
+- **DoD**: ① `out/`을 그대로 올려 동작한다 ② 배포본 DevTools에 원본 소스맵이 노출되지 않는다 ③ 푸터에 라이선스 고지가 보인다 — **확인 완료**
 
 ---
 
@@ -779,12 +780,13 @@ VC Planner 자체의 소스코드는 BUSL-1.1로 보호되며 무단 재배포·
 ## 13. 다음 액션
 
 1. ~~3-2 버전 정책(**Next.js 15 + React 19**)과 3-0 환경 정보 확정~~ ✅ 완료
-2. ~~12-3장 라이선스를 **BUSL-1.1**로 확정~~ ✅ 완료 — 단, `LICENSE` 작성에 필요한 **Licensor 표기명**과 **Change Date**는 미정
+2. ~~12-3장 라이선스를 **BUSL-1.1**로 확정~~ ✅ 완료 — Licensor `lky9464`, Change Date `2030-07-27`, Change License Apache-2.0
 3. ~~Phase 0 착수. 12-1장 `next.config.ts` 설정을 함께 적용한다.~~ ✅ 완료
 4. ~~Phase 0 완료 시점에 1-2장 가드레일(G1~G12)을 `.cursorrules` + `AGENTS.md`로 생성한다.~~ ✅ 완료
 5. ~~Phase 0 승인 후 Phase 1(공통 입력 컴포넌트)로 넘어간다.~~ ✅ Phase 0~7 완료 (PDF 제외)
-6. **Phase 8 착수** — `LICENSE`·`NOTICE`, 푸터 라이선스 고지, Cloudflare Pages 배포 문서, `out/` 배포 DoD
-7. **(배포 후 선택)** PDF 리포트 — Step 1~3 설계 화면 A4 저장, 기술 검토 후 [G8] 승인
+6. ~~**Phase 8 착수** — `LICENSE`·`NOTICE`, 푸터 라이선스 고지, Cloudflare Pages 배포 문서, `out/` 배포 DoD~~ ✅ 완료
+7. **Cloudflare Pages 실제 배포** — `docs/DEPLOY.md` 절차로 Git 연동 후 운영 URL 확보
+8. **(배포 후 선택)** PDF 리포트 — Step 1~3 설계 화면 A4 저장, 기술 검토 후 [G8] 승인
 
 ### Phase 0 결과 메모
 

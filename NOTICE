@@ -1,0 +1,55 @@
+VC Planner
+Copyright (c) 2026 lky9464
+
+This product includes software developed by third parties under open source
+licenses. The following notices are provided for attribution purposes.
+
+---
+
+Next.js
+Copyright (c) Vercel, Inc.
+Licensed under the MIT License
+https://github.com/vercel/next.js
+
+React / react-dom
+Copyright (c) Meta Platforms, Inc. and affiliates.
+Licensed under the MIT License
+https://github.com/facebook/react
+
+@xyflow/react
+Copyright (c) 2019-2024 webkid GmbH
+Licensed under the MIT License
+https://github.com/xyflow/xyflow
+
+react-grid-layout
+Copyright (c) 2016-2024 React Grid Layout authors
+Licensed under the MIT License
+https://github.com/react-grid-layout/react-grid-layout
+
+lucide-react
+Copyright (c) Lucide Contributors
+Licensed under the ISC License
+https://github.com/lucide-icons/lucide
+
+Tailwind CSS
+Copyright (c) Tailwind Labs, Inc.
+Licensed under the MIT License
+https://github.com/tailwindlabs/tailwindcss
+
+TypeScript
+Copyright (c) Microsoft Corporation
+Licensed under the Apache License, Version 2.0
+https://github.com/microsoft/TypeScript
+
+ESLint
+Copyright OpenJS Foundation and other contributors
+Licensed under the MIT License
+https://github.com/eslint/eslint
+
+---
+
+Full license texts for the above dependencies are available in their respective
+repositories or in node_modules after running npm install.
+
+VC Planner source code (excluding third-party components listed above) is
+licensed under BUSL-1.1. See the LICENSE file in this repository.

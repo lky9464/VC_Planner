@@ -39,6 +39,7 @@ npm run build
 
 - **개발 계획·명세**: [`Plan.md`](Plan.md) (Single Source of Truth)
 - **세션 인수인계**: [`docs/HANDOFF.md`](docs/HANDOFF.md)
+- **Cloudflare Pages 배포**: [`docs/DEPLOY.md`](docs/DEPLOY.md)
 
 ## 라이선스
 
@@ -48,4 +49,4 @@ npm run build
 - 소스코드의 **무단 재배포·재가공·상업적 재호스팅**은 금지됩니다.
 - 이 도구로 **생성한 명세서(`Prompt.md` 등)의 저작권은 작성자 본인**에게 있으며, 자유롭게 사용·수정·배포할 수 있습니다.
 
-자세한 조항은 루트 `LICENSE`(Phase 8) 및 `Plan.md` 12-3장을 참조하세요.
+자세한 조항은 [`LICENSE`](LICENSE), 서드파티 고지는 [`NOTICE`](NOTICE), 정책 요약은 `Plan.md` 12-3장을 참조하세요.
