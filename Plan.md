@@ -725,7 +725,7 @@ export default nextConfig;
 | 산출물 | 구현 | 빌드 결과 |
 |---|---|---|
 | `robots.txt` | `src/app/robots.ts` | `out/robots.txt` |
-| `sitemap.xml` | `src/app/sitemap.ts` | `out/sitemap.xml` |
+| `sitemap.xml` | `scripts/generate-sitemap.mjs` → `public/sitemap.xml` | `out/sitemap.xml` (정적 파일, CF Pages 호환) |
 | `<head>` metadata | `src/app/layout.tsx` + `siteConfig` | title·description·OG·Twitter·canonical·hreflang |
 | JSON-LD | `src/components/seo/JsonLd.tsx` | `WebApplication` (schema.org, 영어) |
 | OG 이미지 | `public/og-image.png` | 링크 공유 썸네일 |
