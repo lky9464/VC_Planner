@@ -15,7 +15,7 @@ VC Planner는 Next.js **Static Export**(`out/`)로 빌드되며, 백엔드·환�
 | 빌드 명령 | `npm run build` |
 | 빌드 출력 디렉터리 | `out` |
 | Node 버전 | 환경 변수 `NODE_VERSION` = `20` (또는 `22`) |
-| 환경 변수 | 없음 |
+| 환경 변수 (선택) | `NEXT_PUBLIC_SITE_URL` — canonical·sitemap·OG URL. 기본 `https://vc-planner.pages.dev`. 커스텀 도메인 시 변경 후 재배포 (`Plan.md` 12-5장) |
 
 ### 연결 절차 (요약)
 
@@ -56,6 +56,13 @@ npx serve out
 - [ ] 새로고침 시 404 없음 (`trailingSlash: true` 적용됨)
 - [ ] 브라우저 DevTools → Sources에 `.map` / 원본 TypeScript 노출 없음
 - [ ] 화면 하단 푸터에 BUSL-1.1 라이선스 고지 표시
+
+## SEO (배포 후)
+
+- [ ] `https://(your-domain)/robots.txt` · `/sitemap.xml` 접속 확인
+- [ ] [Google Search Console](https://search.google.com/search-console) sitemap 제출
+- [ ] (선택) 네이버 서치어드바이저 sitemap 제출
+- [ ] 커스텀 도메인 전환 시: `NEXT_PUBLIC_SITE_URL` 설정 → 재배포 → Search Console 속성 추가
 
 ## 라이선스 고지
 

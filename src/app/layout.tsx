@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { siteConfig } from "@/lib/site/config";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -13,9 +15,48 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "VC Planner — 개발 명세서 만들기",
-  description:
-    "단계별 질문에 답하기만 하면 AI 코딩 Agent에게 그대로 전달할 수 있는 개발 명세서가 만들어집니다.",
+  metadataBase: new URL(siteConfig.url),
+  title: {
+    default: siteConfig.seo.title,
+    template: `%s | ${siteConfig.name}`,
+  },
+  description: siteConfig.seo.description,
+  keywords: [...siteConfig.seo.keywords],
+  robots: {
+    index: true,
+    follow: true,
+  },
+  alternates: {
+    canonical: "/",
+    languages: {
+      en: "/",
+      ko: "/",
+      "x-default": "/",
+    },
+  },
+  openGraph: {
+    type: "website",
+    url: siteConfig.url,
+    siteName: siteConfig.name,
+    title: siteConfig.seo.title,
+    description: siteConfig.seo.description,
+    locale: "en_US",
+    alternateLocale: ["ko_KR"],
+    images: [
+      {
+        url: siteConfig.seo.ogImagePath,
+        width: 1440,
+        height: 900,
+        alt: siteConfig.seo.ogImageAlt,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: siteConfig.seo.title,
+    description: siteConfig.seo.description,
+    images: [siteConfig.seo.ogImagePath],
+  },
 };
 
 export default function RootLayout({
@@ -28,8 +69,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <JsonLd />
         {children}
       </body>
     </html>
   );
-}
+};

@@ -2,7 +2,7 @@
 
 > **서비스명**: VC Planner
 > **한 줄 설명**: 비개발자가 단계별 질문·플로우차트·와이어프레임으로 서비스를 설계하고, 어떤 AI Coding Agent에도 붙여넣을 수 있는 표준 Markdown 개발 명세서(`Prompt.md` + Agent 규칙 파일)를 생성하는 웹 서비스
-> **문서 버전**: v1.5
+> **문서 버전**: v1.6
 > **변경 이력**:
 > - v1.0 — 초안
 > - v1.1 — ① `[✨ AI 추천]` 버튼 의미 확정(다운스트림 Agent 위임) ② Agent 범용성(도구 비종속 표준 Markdown) 요구사항 추가 ③ Cloudflare Pages 배포·라이선스·소스 보호 가드레일 추가 ④ 개발 환경 버전 정보 확정 기록
@@ -10,6 +10,7 @@
 > - v1.3 — ① 업무 흐름도·와이어프레임 캔버스 아래 `전달 사항(선택)` 입력란 ② Prompt.md 3-1·3-2에 작성자 메모 반영 ③ Step 4에서 `[📋 전체 프롬프트 복사]` 제거(Prompt.md·txt 다운로드와 중복)
 > - v1.4 — ① Phase 6 완료(Step 4 출력·DoD 확인) ② Phase 7 마감(README·미리보기 서랍) ③ **PDF 리포트는 v1 배포 후 선택 과제로 연기**(UI·`html2pdf.js` 미포함) ④ Step 4 UI: Agent 도구 선택 → Prompt / Rule 2줄 배치
 > - v1.5 — ① Phase 8 완료(LICENSE·NOTICE·`_headers`·배포 문서) ② Licensor `lky9464`, Change Date `2030-07-27` 확정
+> - v1.6 — ① **SEO** (`robots`·`sitemap`·metadata·JSON-LD) ② `NEXT_PUBLIC_SITE_URL`로 커스텀 도메인 전환 여지 ③ 검색 메타는 **영어 우선**(UI는 한국어 유지)
 
 ---
 
@@ -694,7 +695,8 @@ export default nextConfig;
 | 빌드 명령 | `npm run build` |
 | 빌드 출력 디렉터리 | `out` |
 | Node 버전 | 환경 변수 `NODE_VERSION = 20` 이상 (로컬은 24.18.0) |
-| 환경 변수 | 없음 (비밀값 없음 [G10]) |
+| 환경 변수 (선택) | `NEXT_PUBLIC_SITE_URL` — 공식 URL(canonical·sitemap·OG). 미설정 시 `https://vc-planner.pages.dev`. **커스텀 도메인** 연결 시 값만 바꾸고 재배포 (12-5장) |
+| 비밀값 | 없음 [G10] |
 
 `public/_headers`로 기본 보안 헤더를 준다. 정적 배포이므로 서버 코드 없이 헤더만으로 처리한다.
 
@@ -707,6 +709,51 @@ export default nextConfig;
 ```
 
 `/*.map`을 차단하는 규칙은 넣지 않는다. 애초에 소스맵을 만들지 않는 것이 정답이고, 없는 파일을 막는 규칙은 오해를 부른다.
+
+### 12-5. SEO (검색·공유 노출)
+
+**목표**: 무료로 검색엔진·SNS 링크 미리보기 품질을 높인다. **UI는 한국어 유지**, 검색용 메타데이터는 **영어 우선**으로 작성해 국가·언어 의존성을 낮춘다.
+
+**공식 URL 정책**
+
+- 기본값: `https://vc-planner.pages.dev/`
+- 트래픽·브랜드 필요 시 **커스텀 도메인**으로 전환 가능. 코드 하드코딩 없이 빌드 env `NEXT_PUBLIC_SITE_URL`만 변경 후 재배포한다.
+- 단일 설정 소스: `src/lib/site/config.ts` (`getSiteUrl()`)
+
+**구현 (Static Export 호환)**
+
+| 산출물 | 구현 | 빌드 결과 |
+|---|---|---|
+| `robots.txt` | `src/app/robots.ts` | `out/robots.txt` |
+| `sitemap.xml` | `src/app/sitemap.ts` | `out/sitemap.xml` |
+| `<head>` metadata | `src/app/layout.tsx` + `siteConfig` | title·description·OG·Twitter·canonical·hreflang |
+| JSON-LD | `src/components/seo/JsonLd.tsx` | `WebApplication` (schema.org, 영어) |
+| OG 이미지 | `public/og-image.png` | 링크 공유 썸네일 |
+
+**언어 분리 원칙**
+
+| 계층 | 언어 | 비고 |
+|---|---|---|
+| 위저드 UI | 한국어 | `html lang="ko"` 유지 [G9] |
+| SEO title·description·JSON-LD | **영어 우선** | 국제 검색·Agent 도구명(Cursor, Claude 등) |
+| keywords | 영어 + 핵심 한국어 소수 | 과도한 키워드 도배 금지 |
+| hreflang | `en` / `ko` / `x-default` → 동일 URL | 다국어 UI 분기 없음 — 단일 페이지 |
+
+**배포 후 수동 작업 (무료)**
+
+1. [Google Search Console](https://search.google.com/search-console) — sitemap URL 제출
+2. [네이버 서치어드바이저](https://searchadvisor.naver.com) — 한국 트래픽 보조
+3. (선택) Bing Webmaster Tools
+
+**커스텀 도메인 전환 체크리스트**
+
+1. Cloudflare Pages → Custom domains 연결
+2. Environment variables: `NEXT_PUBLIC_SITE_URL=https://(새 도메인)` (끝 슬래시 없음)
+3. `npm run build` → 재배포
+4. Search Console에 **새 속성** 추가 + sitemap 재제출
+5. (선택) `pages.dev` → 새 도omain 301 리다이렉트 — Cloudflare Rules
+
+**DoD**: ① `/robots.txt`·`/sitemap.xml` 200 응답 ② view-source에 OG·JSON-LD 존재 ③ `NEXT_PUBLIC_SITE_URL` 변경 시 sitemap·canonical이 따라감
 
 ### 12-3. 라이선스 정책
 
@@ -785,8 +832,11 @@ VC Planner 자체의 소스코드는 BUSL-1.1로 보호되며 무단 재배포·
 4. ~~Phase 0 완료 시점에 1-2장 가드레일(G1~G12)을 `.cursorrules` + `AGENTS.md`로 생성한다.~~ ✅ 완료
 5. ~~Phase 0 승인 후 Phase 1(공통 입력 컴포넌트)로 넘어간다.~~ ✅ Phase 0~7 완료 (PDF 제외)
 6. ~~**Phase 8 착수** — `LICENSE`·`NOTICE`, 푸터 라이선스 고지, Cloudflare Pages 배포 문서, `out/` 배포 DoD~~ ✅ 완료
-7. **Cloudflare Pages 실제 배포** — `docs/DEPLOY.md` 절차로 Git 연동 후 운영 URL 확보
-8. **(배포 후 선택)** PDF 리포트 — Step 1~3 설계 화면 A4 저장, 기술 검토 후 [G8] 승인
+7. ~~**Cloudflare Pages 실제 배포**~~ ✅ https://vc-planner.pages.dev/
+8. ~~**SEO (12-5)** — robots·sitemap·metadata·JSON-LD~~ ✅ v1.6
+9. **Search Console / 서치어드바이저** — sitemap 수동 제출 (운영)
+10. **(배포 후 선택)** PDF 리포트 — Step 1~3 설계 화면 A4 저장, 기술 검토 후 [G8] 승인
+11. **(트래픽 증가 시)** 커스텀 도메인 + `NEXT_PUBLIC_SITE_URL` 전환 (12-5장)
 
 ### Phase 0 결과 메모
 
